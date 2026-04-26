@@ -1,0 +1,69 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+}
+
+.title {
+  font-size: 2rem;
+  color: #111827;
+}
+
+.createBox {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.button {
+  padding: 0.75rem 1rem;
+  background: #111827;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.noteCard {
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.backButton {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.backButton:hover {
+  color: #111827;
+}
+
+.noteCard {
+  display: block;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #111827;
+}
+
+.noteCard:hover {
+  background: #f9fafb;
+}

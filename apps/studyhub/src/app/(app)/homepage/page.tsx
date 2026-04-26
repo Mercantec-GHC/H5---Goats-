@@ -1,7 +1,7 @@
 // src/app/homepage/page.tsx
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-
+import DebugCreateSubject from "@/components/DebugCreateSubject";
 export default async function Homepage() {
   const session = await auth();
 

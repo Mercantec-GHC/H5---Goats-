@@ -6,6 +6,8 @@ export const notes = pgTable("notes", {
 
   title: text("title").notNull(),
 
+  ydocState: text("ydoc_state").default("").notNull(),
+
   ownerId: uuid("owner_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),

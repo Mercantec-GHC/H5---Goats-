@@ -1,29 +1,27 @@
-# H6
+# StudyHub
 
-Skabelon til MAGS svendeprøven. Overblik og krav: [H6 på Mercantec](https://mercantec.notion.site/h6).
+StudyHub er en webapplikation til at organisere noter, emner og fag.
 
-## Notes
+Projektet er lavet som en del af H5 minisvendeprøven.
 
-Valgfri Obsidian-noter. Vil I ikke bruge dem, så slet mappen `Notes` (og evt. `.obsidian`).
+---
 
-## Dokumentation (MkDocs)
+## 🚀 Tech Stack
 
-Skriv i Markdown under [`Rapport/docs/`](Rapport/docs/). Preview:
+- Next.js
 
-```bash
-cd Rapport
-pip install -r requirements-docs.txt
-mkdocs serve
-```
+- NextAuth (Google login)
 
-Åbn [http://127.0.0.1:8000](http://127.0.0.1:8000).
+- PostgreSQL (Neon)
 
-**Docker** (samme mappe som `Dockerfile`):
+- Drizzle ORM
 
-```bash
-cd Rapport
-docker build -t h6-rapport .
-docker run --rm -p 8000:8000 h6-rapport
-```
+- HocusPocus/Yjs (websocket server)
 
-PDF-export: `npm install` og `npm run pdf` i `Rapport` (kræver kørende docs-URL; se `Rapport/scripts/export-print-pdf.mjs`).
+---
+
+## ⚙️ Setup
+
+### Installer dependencies
+
+npm install

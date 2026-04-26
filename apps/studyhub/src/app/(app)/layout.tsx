@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 
 export default async function AppLayout({
   children,
@@ -14,9 +15,18 @@ export default async function AppLayout({
   }
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      {/* Top navbar */}
       <Navbar />
-      <main>{children}</main>
-    </>
+
+      {/* Main area */}
+      <div style={{ display: "flex", flex: 1 }}>
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Content */}
+        <main style={{ flex: 1, padding: "2rem" }}>{children}</main>
+      </div>
+    </div>
   );
 }
