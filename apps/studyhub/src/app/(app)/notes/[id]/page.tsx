@@ -1,35 +1,14 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { JSONContent } from "@tiptap/react";
 import styles from "./page.module.css";
 import NoteEditor from "@/components/NoteEditor";
 
 type Note = {
   id: string;
   title: string;
-  ydocState: string;
   topicId: string | null;
 };
-
-const emptyDocument: JSONContent = {
-  type: "doc",
-  content: [
-    {
-      type: "paragraph",
-    },
-  ],
-};
-
-function parseEditorContent(value: string): JSONContent {
-  if (!value) return emptyDocument;
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return emptyDocument;
-  }
-}
 
 export default function NotePage({
   params,
@@ -39,28 +18,25 @@ export default function NotePage({
   const { id } = use(params);
 
   const [note, setNote] = useState<Note | null>(null);
-  const [editorContent, setEditorContent] =
-    useState<JSONContent>(emptyDocument);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const fetchNote = async () => {
-    const res = await fetch(`/api/notes/${id}`);
-    const data = await res.json();
-
-    setNote(data);
-    setEditorContent(parseEditorContent(data.ydocState));
-    setLoading(false);
-  };
+  const [savingTitle, setSavingTitle] = useState(false);
 
   useEffect(() => {
+    const fetchNote = async () => {
+      const res = await fetch(`/api/notes/${id}`);
+      const data = await res.json();
+
+      setNote(data);
+      setLoading(false);
+    };
+
     fetchNote();
   }, [id]);
 
-  const saveNote = async () => {
+  const saveTitle = async () => {
     if (!note) return;
 
-    setSaving(true);
+    setSavingTitle(true);
 
     await fetch(`/api/notes/${id}`, {
       method: "PATCH",
@@ -69,11 +45,10 @@ export default function NotePage({
       },
       body: JSON.stringify({
         title: note.title,
-        ydocState: JSON.stringify(editorContent),
       }),
     });
 
-    setSaving(false);
+    setSavingTitle(false);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -87,17 +62,12 @@ export default function NotePage({
         onChange={(e) =>
           setNote((prev) => prev && { ...prev, title: e.target.value })
         }
+        onBlur={saveTitle}
       />
 
       <NoteEditor noteId={note.id} />
 
-      <button
-        className={styles.saveButton}
-        onClick={saveNote}
-        disabled={saving}
-      >
-        {saving ? "Gemmer..." : "Gem"}
-      </button>
+      {savingTitle ? <p>Gemmer titel...</p> : null}
     </section>
   );
 }

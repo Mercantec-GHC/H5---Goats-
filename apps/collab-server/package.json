@@ -13,6 +13,7 @@
   "type": "commonjs",
   "dependencies": {
     "@hocuspocus/server": "^4.0.0",
+    "@studyhub/db": "^0.0.1",
     "dotenv": "^17.4.2",
     "yjs": "^13.6.30"
   },
