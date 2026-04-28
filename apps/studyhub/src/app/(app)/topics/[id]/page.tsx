@@ -42,12 +42,15 @@ export default function TopicPage({
   const createNote = async () => {
     if (!noteTitle.trim()) return;
 
-    await fetch(`/api/topics/${id}/notes`, {
+    await fetch("/api/notes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title: noteTitle }),
+      body: JSON.stringify({
+        title: noteTitle,
+        topicId: id,
+      }),
     });
 
     setNoteTitle("");

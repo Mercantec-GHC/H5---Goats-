@@ -1,0 +1,53 @@
+.wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: black;
+}
+
+.toolbar button {
+  border: 1px solid #d1d5db;
+  background: black;
+  border-radius: 6px;
+  padding: 0.4rem 0.65rem;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  background: #f3f4f6;
+}
+
+.active {
+  background: #111827 !important;
+  color: white;
+  border-color: #111827 !important;
+}
+
+.editor {
+  padding: 1rem;
+  min-height: 350px;
+  background: white;
+  color: #111827;
+}
+
+.editor :global(.ProseMirror) {
+  min-height: 350px;
+  outline: none;
+  color: #111827;
+}
+
+.editor :global(.ProseMirror p),
+.editor :global(.ProseMirror h1),
+.editor :global(.ProseMirror h2),
+.editor :global(.ProseMirror h3),
+.editor :global(.ProseMirror li) {
+  color: #111827;
+}
