@@ -1,116 +1,46 @@
-"use client";
-
-import { use, useEffect, useState } from "react";
-import styles from "./page.module.css";
+// src/app/(app)/subjects/[id]/page.tsx
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { db, subjects, topics } from "@studyhub/db";
+import { and, asc, eq } from "drizzle-orm";
 import Link from "next/link";
+import styles from "./page.module.css";
+import CreateTopicForm from "./CreateTopicForm";
 
-type Topic = {
-  id: string;
-  title: string;
-  subjectId: string;
-  createdAt: string;
-};
-
-type SubjectWithTopics = {
-  id: string;
-  title: string;
-  ownerId: string;
-  createdAt: string;
-  topics: Topic[];
-};
-
-export default function SubjectPage({
+export default async function SubjectPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
+  const { id } = await params;
 
-  const [subject, setSubject] = useState<SubjectWithTopics | null>(null);
-  const [topicTitle, setTopicTitle] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
-  const [error, setError] = useState("");
+  const session = await auth();
 
-  const fetchSubject = async () => {
-    setError("");
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
 
-    const res = await fetch(`/api/subjects/${id}`);
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.error ?? "Kunne ikke hente faget");
-      setSubject(null);
-      setLoading(false);
-      return;
-    }
-
-    setSubject(data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchSubject();
-  }, [id]);
-
-  const createTopic = async () => {
-    if (!topicTitle.trim()) return;
-
-    setCreating(true);
-    setError("");
-
-    const res = await fetch(`/api/subjects/${id}/topics`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  const subject = await db.query.subjects.findFirst({
+    where: and(eq(subjects.id, id), eq(subjects.ownerId, session.user.id)),
+    with: {
+      topics: {
+        orderBy: [asc(topics.createdAt)],
       },
-      body: JSON.stringify({ title: topicTitle }),
-    });
+    },
+  });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.error ?? "Kunne ikke oprette emne");
-      setCreating(false);
-      return;
-    }
-
-    setTopicTitle("");
-    await fetchSubject();
-    setCreating(false);
-  };
-
-  if (loading) return <p>Loading...</p>;
-
-  if (!subject) return <p>Fag blev ikke fundet.</p>;
+  if (!subject) {
+    return <p>Fag blev ikke fundet.</p>;
+  }
 
   return (
     <section className={styles.container}>
       <div className={styles.header}>
-        <div>
-          <p className={styles.label}>Fag</p>
-          <h1 className={styles.title}>{subject.title}</h1>
-        </div>
+        <p className={styles.label}>Fag</p>
+        <h1 className={styles.title}>{subject.title}</h1>
       </div>
 
-      <div className={styles.createBox}>
-        <input
-          className={styles.input}
-          value={topicTitle}
-          onChange={(e) => setTopicTitle(e.target.value)}
-          placeholder="Nyt emne"
-        />
-
-        <button
-          className={styles.button}
-          onClick={createTopic}
-          disabled={creating || !topicTitle.trim()}
-        >
-          {creating ? "Opretter..." : "Opret emne"}
-        </button>
-      </div>
-
-      {error ? <p className={styles.error}>{error}</p> : null}
+      <CreateTopicForm subjectId={subject.id} />
 
       <div className={styles.topicSection}>
         <h2 className={styles.subtitle}>Emner</h2>

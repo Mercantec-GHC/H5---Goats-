@@ -70,12 +70,10 @@ export async function PATCH(req: Request, { params }: RouteContext) {
   const body = await req.json();
 
   const title = typeof body.title === "string" ? body.title.trim() : undefined;
-  const ydocState =
-    typeof body.ydocState === "string" ? body.ydocState : undefined;
 
-  if (title === "" && ydocState === undefined) {
+  if (!title) {
     return NextResponse.json(
-      { error: "Nothing to update" },
+      { error: "Title is required" },
       { status: 400 }
     );
   }
@@ -86,23 +84,41 @@ export async function PATCH(req: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "Note not found" }, { status: 404 });
   }
 
-  const updateData: Partial<typeof notes.$inferInsert> = {
-    updatedAt: new Date(),
-  };
-
-  if (title !== undefined) {
-    updateData.title = title;
-  }
-
-  if (ydocState !== undefined) {
-    updateData.ydocState = ydocState;
-  }
-
   const [updatedNote] = await db
     .update(notes)
-    .set(updateData)
+    .set({
+      title,
+      updatedAt: new Date(),
+    })
     .where(eq(notes.id, noteId))
     .returning();
 
   return NextResponse.json(updatedNote);
+}
+
+export async function DELETE(_req: Request, { params }: RouteContext) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id: noteId } = await params;
+
+  const note = await getAccessibleNote(noteId, session.user.id);
+
+  if (!note) {
+    return NextResponse.json({ error: "Note not found" }, { status: 404 });
+  }
+
+  if (note.ownerId !== session.user.id) {
+    return NextResponse.json(
+      { error: "Only the owner can delete this note" },
+      { status: 403 }
+    );
+  }
+
+  await db.delete(notes).where(eq(notes.id, noteId));
+
+  return NextResponse.json({ success: true });
 }

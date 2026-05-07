@@ -3,6 +3,8 @@
 import { use, useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
+import NoteCard from "@/components/NoteCard";
+
 type Note = {
   id: string;
   title: string;
@@ -85,15 +87,16 @@ export default function TopicPage({
         {topic.notes.length === 0 ? (
           <p>Ingen noter endnu</p>
         ) : (
-          topic.notes.map((note) => (
-            <Link
-              key={note.id}
-              href={`/notes/${note.id}`}
-              className={styles.noteCard}
-            >
-              {note.title}
-            </Link>
-          ))
+          <div className={styles.grid}>
+            {topic.notes.map((note) => (
+              <NoteCard
+                key={note.id}
+                id={note.id}
+                title={note.title}
+                topicTitle={topic.title}
+              />
+            ))}
+          </div>
         )}
       </div>
     </section>

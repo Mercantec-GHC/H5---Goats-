@@ -13,6 +13,9 @@ export async function GET() {
   const userSubjects = await db.query.subjects.findMany({
     where: eq(subjects.ownerId, session.user.id),
     orderBy: [asc(subjects.title)],
+    with: {
+      topics: true, // 👈 vigtig
+    },
   });
 
   return NextResponse.json(userSubjects);

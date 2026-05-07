@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import styles from "./Sidebar.module.css";
 
 type Subject = {
+  id: string;
+  title: string;
+  topics: Topic[];
+};
+
+type Topic = {
   id: string;
   title: string;
 };
@@ -12,6 +19,7 @@ type Subject = {
 export default function Sidebar() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [newTitle, setNewTitle] = useState("");
+  const pathname = usePathname();
 
   const fetchSubjects = async () => {
     const res = await fetch("/api/subjects");
@@ -82,29 +90,38 @@ export default function Sidebar() {
 
       {/* List */}
       <ul className={styles.list}>
-        {subjects.map((s) => (
-          <li key={s.id} className={styles.item}>
-            <Link href={`/subjects/${s.id}`} className={styles.link}>
-              {s.title}
-            </Link>
+        {subjects.map((s) => {
+          const isActive =
+            pathname === `/subjects/${s.id}` ||
+            s.topics.some((topic) => pathname === `/topics/${topic.id}`);
 
-            <div className={styles.actions}>
-              <button
-                className={styles.button}
-                onClick={() => handleRename(s.id, s.title)}
-              >
-                ✏️
-              </button>
+          return (
+            <li
+              key={s.id}
+              className={`${styles.item} ${isActive ? styles.active : ""}`}
+            >
+              <Link href={`/subjects/${s.id}`} className={styles.link}>
+                {s.title}
+              </Link>
 
-              <button
-                className={styles.button}
-                onClick={() => handleDelete(s.id)}
-              >
-                🗑
-              </button>
-            </div>
-          </li>
-        ))}
+              <div className={styles.actions}>
+                <button
+                  className={styles.button}
+                  onClick={() => handleRename(s.id, s.title)}
+                >
+                  ✏️
+                </button>
+
+                <button
+                  className={styles.button}
+                  onClick={() => handleDelete(s.id)}
+                >
+                  🗑
+                </button>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

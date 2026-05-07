@@ -1,7 +1,36 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db, notes, notePlacements, topics } from "@studyhub/db";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+
+export async function GET() {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const userPlacements = await db.query.notePlacements.findMany({
+    where: eq(notePlacements.userId, session.user.id),
+    with: {
+      note: true,
+      topic: {
+        with: {
+          subject: true,
+        },
+      },
+    },
+    orderBy: [desc(notePlacements.createdAt)],
+  });
+
+  const userNotes = userPlacements.map((placement) => ({
+    ...placement.note,
+    topicId: placement.topicId,
+    topic: placement.topic,
+  }));
+
+  return NextResponse.json(userNotes);
+}
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -13,7 +42,7 @@ export async function POST(req: Request) {
   const body = await req.json();
 
   const title = body?.title?.trim();
-  const topicId = body?.topicId ?? null;
+  const topicId = typeof body.topicId === "string" ? body.topicId : null;
 
   if (!title) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -47,5 +76,11 @@ export async function POST(req: Request) {
     topicId,
   });
 
-  return NextResponse.json(newNote, { status: 201 });
+  return NextResponse.json(
+    {
+      ...newNote,
+      topicId,
+    },
+    { status: 201 },
+  );
 }

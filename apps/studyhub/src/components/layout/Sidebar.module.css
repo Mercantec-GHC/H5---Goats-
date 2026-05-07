@@ -16,7 +16,7 @@
 .title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: white;
+  color: black;
 }
 
 .list {
@@ -44,7 +44,7 @@
 
 .link {
   text-decoration: none;
-  color: white;
+  color: black;
   flex: 1;
 }
 
@@ -84,4 +84,14 @@
   background: #111827;
   color: white;
   cursor: pointer;
+}
+
+.active {
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+}
+
+.active .link {
+  color: var(--text-primary);
+  font-weight: 600;
 }
