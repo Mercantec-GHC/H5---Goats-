@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import styles from "./NoteCard.module.css";
+import { Trash2 } from "lucide-react";
 
 type NoteCardProps = {
   id: string;
@@ -18,8 +21,27 @@ export default function NoteCard({
     ? new Date(updatedAt).toLocaleDateString("da-DK")
     : "";
 
+  const deleteNote = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const confirmed = confirm("Er du sikker på at du vil slette noten?");
+
+    if (!confirmed) return;
+
+    await fetch(`/api/notes/${id}`, {
+      method: "DELETE",
+    });
+
+    window.location.reload();
+  };
+
   return (
     <Link href={`/notes/${id}`} className={styles.card}>
+      <button className={styles.deleteButton} onClick={deleteNote}>
+        <Trash2 size={16} />
+      </button>
+
       <div className={styles.preview}>
         <div className={styles.line} />
         <div className={styles.lineShort} />
@@ -28,6 +50,7 @@ export default function NoteCard({
 
       <div className={styles.body}>
         <h3 className={styles.title}>{title}</h3>
+
         <p className={styles.meta}>
           {topicTitle ?? "Unsorted"}
           {dateText ? ` · ${dateText}` : ""}

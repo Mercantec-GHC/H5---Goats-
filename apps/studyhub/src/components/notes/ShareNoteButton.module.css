@@ -1,0 +1,35 @@
+.wrapper {
+  position: relative;
+}
+
+.button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  min-width: 150px;
+  min-height: 40px;
+}
+
+.button:hover {
+  background: var(--surface-muted);
+}
+
+.button:disabled {
+  opacity: 0.6;
+}
+
+.status {
+  right: 0;
+  top: calc(100% + 0.4rem);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.error {
+  color: var(--danger);
+}

@@ -5,7 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import styles from "./page.module.css";
 import NoteCard from "@/components/NoteCard";
 import CreateNoteCard from "@/components/CreateNoteCard";
-
+import NotesSearch from "@/components/notes/NotesSearch";
 export default async function Homepage() {
   const session = await auth();
 
@@ -28,32 +28,56 @@ export default async function Homepage() {
     topic: placement.topic,
   }));
 
-  const unsorted = notes.filter((note) => note.topicId === null);
+  const sharedWithMe = notes.filter((note) => note.ownerId !== session.user.id);
+
+  const ownNotes = notes.filter((note) => note.ownerId === session.user.id);
+
+  const unsorted = ownNotes.filter((note) => note.topicId === null);
   const recent = notes.slice(0, 6);
 
   return (
     <main className={styles.container}>
-      {/* Header */}
       <div className={styles.header}>
         <h1>Velkommen tilbage 👋</h1>
         <p>Fortsæt hvor du slap</p>
       </div>
 
-      {/* Recent Notes */}
       <section className={styles.section}>
+        <NotesSearch notes={notes} currentUserId={session.user.id} />
         <h2 className={styles.sectionTitle}>Seneste noter</h2>
 
-        {recent.length === 0 ? (
-          <p>Ingen noter endnu</p>
+        <div className={styles.grid}>
+          <CreateNoteCard />
+
+          {recent.map((note) => (
+            <NoteCard
+              key={note.id}
+              id={note.id}
+              title={note.title}
+              topicTitle={
+                note.ownerId !== session.user.id
+                  ? "Delt med mig"
+                  : note.topic?.title
+              }
+              updatedAt={note.updatedAt}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Delt med mig</h2>
+
+        {sharedWithMe.length === 0 ? (
+          <p>Ingen delte noter endnu</p>
         ) : (
           <div className={styles.grid}>
-            <CreateNoteCard />
-            {recent.map((note) => (
+            {sharedWithMe.map((note) => (
               <NoteCard
                 key={note.id}
                 id={note.id}
                 title={note.title}
-                topicTitle={note.topic?.title}
+                topicTitle="Delt med mig"
                 updatedAt={note.updatedAt}
               />
             ))}
@@ -61,7 +85,6 @@ export default async function Homepage() {
         )}
       </section>
 
-      {/* Unsorted */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Unsorted</h2>
 

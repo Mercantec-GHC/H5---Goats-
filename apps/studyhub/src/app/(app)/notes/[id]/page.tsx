@@ -4,23 +4,31 @@ import { use, useEffect, useState } from "react";
 import styles from "./page.module.css";
 import NoteEditor from "@/components/NoteEditor";
 import { useSession } from "next-auth/react";
-
+import ShareNoteButton from "@/components/notes/ShareNoteButton";
+import CollaboratorsSidebar from "@/components/notes/CollaboratorsSidebar";
 type Note = {
   id: string;
   title: string;
   topicId: string | null;
 };
 
-// 🔥 deterministisk farve
 function getColorFromString(str: string) {
   const colors = [
-    "#2563eb", // blue
-    "#dc2626", // red
-    "#16a34a", // green
-    "#9333ea", // purple
-    "#f59e0b", // yellow
-    "#0891b2", // cyan
-    "#db2777", // pink
+    "#2563eb",
+    "#dc2626",
+    "#16a34a",
+    "#9333ea",
+    "#f59e0b",
+    "#0891b2",
+    "#db2777",
+    "#ea580c",
+    "#4f46e5",
+    "#059669",
+    "#be123c",
+    "#7c3aed",
+    "#0f766e",
+    "#c2410c",
+    "#4338ca",
   ];
 
   let hash = 0;
@@ -96,24 +104,38 @@ export default function NotePage({
 
   const userName = session?.user?.name ?? session?.user?.email ?? "Anonymous";
 
+  const colorKey = session?.user?.id ?? session?.user?.email ?? userName;
+
   return (
     <section className={styles.container}>
-      <input
-        className={styles.title}
-        value={note.title}
-        onChange={(e) =>
-          setNote((prev) => prev && { ...prev, title: e.target.value })
-        }
-        onBlur={saveTitle}
-      />
+      <div className={styles.header}>
+        <input
+          className={styles.title}
+          value={note.title}
+          onChange={(e) =>
+            setNote((prev) => prev && { ...prev, title: e.target.value })
+          }
+          onBlur={saveTitle}
+        />
 
-      <NoteEditor
-        noteId={note.id}
-        user={{
-          name: userName,
-          color: getColorFromString(userName),
-        }}
-      />
+        <ShareNoteButton noteId={note.id} />
+      </div>
+
+      <div className={styles.contentLayout}>
+        <div className={styles.editorSection}>
+          <NoteEditor
+            noteId={note.id}
+            user={{
+              name: userName,
+              color: getColorFromString(colorKey),
+            }}
+          />
+        </div>
+
+        <aside className={styles.sidebar}>
+          <CollaboratorsSidebar noteId={note.id} />
+        </aside>
+      </div>
 
       {savingTitle ? <p>Gemmer titel...</p> : null}
     </section>

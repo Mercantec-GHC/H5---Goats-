@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  border: 2px solid var(--surface);
+  box-shadow: var(--shadow-sm);
+}
