@@ -10,7 +10,7 @@ export default function LoginPage() {
   if (status === "loading") return null;
 
   if (session) {
-    redirect("/");
+    redirect("/homepage");
   }
 
   return (
