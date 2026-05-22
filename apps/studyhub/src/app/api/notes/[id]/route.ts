@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db, notes, noteCollaborators, notePlacements } from "@studyhub/db";
 import { and, eq } from "drizzle-orm";
-
+// Routecontext er et objekt, der indeholder parametre for rutehåndtering
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
-
+// Funktion til at hente en note, hvis brugeren enten er ejer eller samarbejdspartner
 async function getAccessibleNote(noteId: string, userId: string) {
   const note = await db.query.notes.findFirst({
     where: eq(notes.id, noteId),
@@ -29,7 +29,8 @@ async function getAccessibleNote(noteId: string, userId: string) {
 
   return note;
 }
-
+// Håndterer hentning, opdatering og sletning af en specifik note
+// Først og fremmest tjekker den om brugeren er logget ind, og om det emne de prøver at tilgå rent faktisk tilhører dem eller de er samarbejdspartner på noten
 export async function GET(_req: Request, { params }: RouteContext) {
   const session = await auth();
 
@@ -57,8 +58,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
     topicId: placement?.topicId ?? null,
   });
 }
-
-
+// Funktion til opdatering af en note
 export async function PATCH(req: Request, { params }: RouteContext) {
   const session = await auth();
 
@@ -95,7 +95,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 
   return NextResponse.json(updatedNote);
 }
-
+// Funktion til sletning af en note, tjekker også om det er ejeren der prøver at slette den, da kun ejeren skal kunne slette en note
 export async function DELETE(_req: Request, { params }: RouteContext) {
   const session = await auth();
 

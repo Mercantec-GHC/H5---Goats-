@@ -6,7 +6,7 @@ import { and, asc, eq } from "drizzle-orm";
 import Link from "next/link";
 import styles from "./page.module.css";
 import CreateTopicForm from "./CreateTopicForm";
-
+// Viser et fag og dets emner
 export default async function SubjectPage({
   params,
 }: {

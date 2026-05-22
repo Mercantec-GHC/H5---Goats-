@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 import NoteCard from "@/components/NoteCard";
 import CreateNoteCard from "@/components/CreateNoteCard";
 import NotesSearch from "@/components/notes/NotesSearch";
+// Hovedsiden efter login, viser seneste noter, delte noter og unsorted noter
 export default async function Homepage() {
   const session = await auth();
 

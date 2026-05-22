@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db, subjects, topics } from "@studyhub/db";
 import { and, asc, eq } from "drizzle-orm";
-
+// Funktion til håndtering af opdatering af et fag
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -33,7 +33,7 @@ export async function GET(
 
   return NextResponse.json(subjectTopics);
 }
-
+// Post funktion til oprettelse af et emne under et fag
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

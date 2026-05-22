@@ -6,7 +6,7 @@ import { and, eq } from "drizzle-orm";
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
-
+// Funktion til at hente en note, hvis brugeren enten er ejer eller samarbejdspartner
 export async function GET(_req: Request, { params }: RouteContext) {
   const session = await auth();
 

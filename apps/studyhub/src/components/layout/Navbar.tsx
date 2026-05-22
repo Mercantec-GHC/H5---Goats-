@@ -3,7 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import styles from "./Navbar.module.css";
-
+// Navbar component
 export default function Navbar() {
   const { data: session } = useSession();
 

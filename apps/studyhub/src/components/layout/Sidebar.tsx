@@ -15,7 +15,7 @@ type Topic = {
   id: string;
   title: string;
 };
-
+// Sidebar component, som viser alle subjects og deres topics
 export default function Sidebar() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [newTitle, setNewTitle] = useState("");

@@ -17,7 +17,7 @@ type TopicWithNotes = {
   notes: Note[];
   subjectId: string;
 };
-
+// Viser et emne og dets noter
 export default function TopicPage({
   params,
 }: {

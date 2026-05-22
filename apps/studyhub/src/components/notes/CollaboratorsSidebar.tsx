@@ -46,7 +46,7 @@ function getColorFromString(str: string) {
 
   return colors[Math.abs(hash) % colors.length];
 }
-
+// CollaboratorsSidebar component
 export default function CollaboratorsSidebar({
   noteId,
 }: CollaboratorsSidebarProps) {
@@ -74,7 +74,7 @@ export default function CollaboratorsSidebar({
   useEffect(() => {
     fetchCollaborators();
   }, [noteId]);
-
+// removeCollaborator er en asynkron funktion, der håndterer fjernelsen af en samarbejdspartner fra en note. Funktionen starter med at bede brugeren om bekræftelse, og hvis brugeren bekræfter, sender den en DELETE-anmodning til serveren for at fjerne samarbejdspartneren. Hvis anmodningen lykkes, opdateres den lokale tilstand for at fjerne samarbejdspartneren fra listen. Hvis der opstår en fejl under processen, vises en fejlmeddelelse.
   const removeCollaborator = async (userId: string) => {
     const confirmed = confirm(
       "Are you sure you want to remove this collaborator?",

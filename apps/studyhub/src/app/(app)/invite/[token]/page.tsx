@@ -8,7 +8,7 @@ type InvitePageProps = {
     token: string;
   }>;
 };
-
+// Viser siden for at acceptere en invitation til at samarbejde om en note
 export default function InvitePage({ params }: InvitePageProps) {
   const { token } = use(params);
   const router = useRouter();

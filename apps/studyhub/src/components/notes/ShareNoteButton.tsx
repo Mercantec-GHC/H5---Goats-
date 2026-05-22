@@ -6,7 +6,7 @@ import styles from "./ShareNoteButton.module.css";
 type ShareNoteButtonProps = {
   noteId: string;
 };
-
+// Funktionalitet til at dele en note ved at oprette et invite link og kopiere det til udklipsholderen. Håndterer loading state, succesbesked og fejlmeddelelser.
 export default function ShareNoteButton({ noteId }: ShareNoteButtonProps) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);

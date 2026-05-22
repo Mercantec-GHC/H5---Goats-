@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import styles from "./CreateNoteCard.module.css";
-
+// CreateNoteCard er en React-komponent, der viser et kort med en "+"-knap og teksten "Ny note". Når brugeren klikker på knappen, sendes en POST-anmodning til "/api/notes" for at oprette en ny note med titlen "Untitled note". Hvis anmodningen er vellykket, navigeres brugeren til den nye notes side ved hjælp af Next.js' useRouter hook.
 export default function CreateNoteCard() {
   const router = useRouter();
 

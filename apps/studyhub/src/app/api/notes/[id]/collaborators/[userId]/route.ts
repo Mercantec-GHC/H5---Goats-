@@ -9,7 +9,7 @@ type RouteContext = {
     userId: string;
   }>;
 };
-
+// Funktion til at slette en samarbejdspartner fra en note
 export async function DELETE(_req: Request, { params }: RouteContext) {
   const session = await auth();
 

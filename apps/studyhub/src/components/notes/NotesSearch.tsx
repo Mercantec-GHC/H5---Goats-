@@ -19,7 +19,7 @@ type NotesSearchProps = {
   notes: Note[];
   currentUserId: string;
 };
-
+// NotesSearch component
 export default function NotesSearch({
   notes,
   currentUserId,

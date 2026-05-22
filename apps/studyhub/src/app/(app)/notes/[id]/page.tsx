@@ -39,7 +39,7 @@ function getColorFromString(str: string) {
 
   return colors[Math.abs(hash) % colors.length];
 }
-
+// Viser en note og dens detaljer
 export default function NotePage({
   params,
 }: {
@@ -75,7 +75,7 @@ export default function NotePage({
 
     fetchNote();
   }, [id]);
-
+// Gemmer den opdaterede titel på noten
   const saveTitle = async () => {
     if (!note) return;
 
@@ -97,7 +97,7 @@ export default function NotePage({
 
     setSavingTitle(false);
   };
-
+// Håndterer loading, error og not found states
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
   if (!note) return <p>Note ikke fundet</p>;

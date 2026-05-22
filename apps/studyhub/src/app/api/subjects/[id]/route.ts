@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db, subjects, topics } from "@studyhub/db";
 import { and, asc, eq } from "drizzle-orm";
-
+// Routecontext er et objekt, der indeholder parametre for rutehåndtering
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
-
+// Funktion til håndtering af opdatering af et fag
 export async function GET(_req: Request, { params }: RouteContext) {
   const session = await auth();
 
@@ -34,7 +34,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
 
   return NextResponse.json(subject);
 }
-
+// Funktion til sletning af et fag
 export async function DELETE(_req: Request, { params }: RouteContext) {
   const session = await auth();
 
@@ -59,7 +59,7 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
 
   return NextResponse.json({ success: true });
 }
-
+// Funktion til opdatering af et fag
 export async function PATCH(req: Request, { params }: RouteContext) {
   const session = await auth();
 

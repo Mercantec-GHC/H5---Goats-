@@ -3,7 +3,7 @@
 import Link from "next/link";
 import styles from "./NoteCard.module.css";
 import { Trash2 } from "lucide-react";
-
+// NoteCard er en React-komponent, der repræsenterer et kort for en note i en noteoversigt. Komponentet viser notens titel, emne (hvis tilgængeligt) og opdateringsdato. Det inkluderer også en sletteknap, der giver brugeren mulighed for at slette noten. Når kortet klikkes, navigeres brugeren til den specifikke notes side ved hjælp af Next.js' Link-komponent.
 type NoteCardProps = {
   id: string;
   title: string;

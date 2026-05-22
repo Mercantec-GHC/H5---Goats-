@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+// Crypto bruges til at generere unikke tokens til note invites
 import crypto from "crypto";
-
+// Auth bruges til at tjekke om brugeren er logget ind og for at få brugerens id
 import { auth } from "@/lib/auth";
-
+// Importerer nødvendige database objekter og funktioner fra Drizzle ORM
 import {
   db,
   notes,
@@ -15,7 +16,7 @@ import { and, eq } from "drizzle-orm";
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
-
+// Funktion til at tjekke om en bruger har adgang til en note, enten som ejer eller samarbejdspartner
 async function hasAccess(noteId: string, userId: string) {
   const note = await db.query.notes.findFirst({
     where: eq(notes.id, noteId),
@@ -36,7 +37,7 @@ async function hasAccess(noteId: string, userId: string) {
 
   return !!collaborator;
 }
-
+// Funktion til at hente en note, hvis brugeren enten er ejer eller samarbejdspartner
 export async function POST(
   _req: Request,
   { params }: RouteContext,
@@ -60,7 +61,7 @@ export async function POST(
       { status: 403 },
     );
   }
-
+// Genererer et unikt token for invite linket
   const token = crypto.randomBytes(32).toString("hex");
 
   await db.insert(noteInvites).values({

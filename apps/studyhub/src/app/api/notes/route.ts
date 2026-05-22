@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db, notes, notePlacements, topics } from "@studyhub/db";
 import { desc, eq } from "drizzle-orm";
-
+// Håndterer hentning og oprettelse af noter
+// Først og fremmest tjekker den om brugeren er logget ind, og ved oprettelse tjekker den også om det emne (topic) de prøver at placere noten under rent faktisk tilhører dem
 export async function GET() {
   const session = await auth();
 
@@ -31,7 +32,7 @@ export async function GET() {
 
   return NextResponse.json(userNotes);
 }
-
+// Funktion til oprettelse af noter
 export async function POST(req: Request) {
   const session = await auth();
 

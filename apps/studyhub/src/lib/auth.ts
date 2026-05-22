@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { eq } from "drizzle-orm";
 import { db, users } from "@studyhub/db";
 
+// authOptions definerer konfigurationen for NextAuth, herunder hvilke udbydere der skal bruges (i dette tilfælde Google), sessionstrategien (JWT), og callbacks til at håndtere JWT-token og session-objekter.
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -52,7 +53,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
-
+// auth-funktionen er en wrapper omkring getServerSession, der bruger de definerede authOptions til at hente den aktuelle session for en anmodning, hvilket gør det nemt at få adgang til brugerens autentificeringsstatus og oplysninger i hele applikationen.
 export function auth() {
   return getServerSession(authOptions);
 }

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db, subjects, topics } from "@studyhub/db";
 import { and, eq } from "drizzle-orm";
-
+// Håndterer opdatering, sletning og hentning af et enkelt emne (topic)
+// Først og fremmest tjekker den om brugeren er logget ind, og om det emne de prøver at tilgå rent faktisk tilhører dem
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -40,7 +41,7 @@ export async function PATCH(
 
   return NextResponse.json(updatedTopic);
 }
-
+// Sletning af et emne, tjekker også om det tilhører brugeren
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -68,7 +69,7 @@ export async function DELETE(
 
   return NextResponse.json({ success: true });
 }
-
+// Hentning af et emne, tjekker også om det tilhører brugeren
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -98,6 +99,7 @@ export async function GET(
   }
 
   // 🔥 Flatten notes (meget vigtigt)
+  // Når vi henter et emne, vil vi også gerne have alle de noter der er placeret i det emne.
   const notes = topic.notePlacements.map((np) => np.note);
 
   return NextResponse.json({

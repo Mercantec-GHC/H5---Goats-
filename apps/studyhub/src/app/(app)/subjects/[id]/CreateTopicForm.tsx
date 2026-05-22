@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
-
+// Bruges til at oprette et nyt emne under et subject
 export default function CreateTopicForm({ subjectId }: { subjectId: string }) {
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ export default function CreateTopicForm({ subjectId }: { subjectId: string }) {
     setTitle("");
     setLoading(false);
 
-    // 🔥 Trigger server re-fetch
+    // Trigger server re-fetch, for at det nye emne kommer frem i listen
     router.refresh();
   };
 
