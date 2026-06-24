@@ -1,5 +1,3 @@
-
-
 import { Server } from "@hocuspocus/server";
 import * as Y from "yjs";
 import { db, notes } from "@studyhub/db";
