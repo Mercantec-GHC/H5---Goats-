@@ -18,7 +18,7 @@ export default function LandingPage() {
       <div className={styles.hero}>
         <h1 className={styles.title}>StudyHub</h1>
         <p className={styles.subtitle}>
-          Organisér og samarbejd på dine noter
+          Organisér og samarbejd på dine noter hej
         </p>
 
         <div className={styles.buttons}>
