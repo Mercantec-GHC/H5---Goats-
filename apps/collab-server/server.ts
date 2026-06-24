@@ -1,4 +1,5 @@
 
+
 import { Server } from "@hocuspocus/server";
 import * as Y from "yjs";
 import { db, notes } from "@studyhub/db";
@@ -6,10 +7,17 @@ import { eq } from "drizzle-orm";
 import dotenv from "dotenv";
 import path from "path";
 
+/**
+ * Load environment variables from root .env
+ */
 dotenv.config({
   path: path.resolve(process.cwd(), "../../.env"),
 });
 
+/**
+ * The document is saved 2 seconds after the latest change.
+ * This prevents database writes on every single keystroke.
+ */
 const SAVE_DEBOUNCE_MS = 2000;
 
 type PendingSave = {
@@ -17,8 +25,15 @@ type PendingSave = {
   document: Y.Doc;
 };
 
+/**
+ * Keeps track of documents waiting to be saved.
+ * Each document room has its own debounce timer.
+ */
 const pendingSaves = new Map<string, PendingSave>();
 
+/**
+ * Saves the current Yjs document state to the database.
+ */
 async function saveDocument(documentName: string, document: Y.Doc) {
   const noteId = documentName.replace("note-", "");
 
@@ -36,6 +51,11 @@ async function saveDocument(documentName: string, document: Y.Doc) {
   console.log("💾 Saved document:", documentName);
 }
 
+/**
+ * Schedules a debounced save.
+ * If new changes happen before the timer finishes,
+ * the old timer is cleared and restarted.
+ */
 function scheduleSave(documentName: string, document: Y.Doc) {
   const existing = pendingSaves.get(documentName);
 
@@ -59,6 +79,10 @@ function scheduleSave(documentName: string, document: Y.Doc) {
   });
 }
 
+/**
+ * Saves all pending documents immediately.
+ * Used during graceful shutdown.
+ */
 async function flushPendingSaves() {
   const saves = Array.from(pendingSaves.entries());
 
@@ -75,9 +99,16 @@ async function flushPendingSaves() {
   pendingSaves.clear();
 }
 
+/**
+ * Hocuspocus WebSocket server.
+ * Each note is treated as its own collaborative document room.
+ */
 const server = new Server({
   port: 1234,
 
+  /**
+   * Loads persisted Yjs state when a note is opened.
+   */
   async onLoadDocument({ documentName, document }) {
     const noteId = documentName.replace("note-", "");
 
@@ -101,10 +132,18 @@ const server = new Server({
     return document;
   },
 
+  /**
+   * Runs whenever the document changes.
+   * The actual database write is debounced.
+   */
   async onChange({ documentName, document }) {
     scheduleSave(documentName, document);
   },
 
+  /**
+   * Extra persistence hook from Hocuspocus.
+   * Used as a fallback/final save.
+   */
   async onStoreDocument({ documentName, document }) {
     await saveDocument(documentName, document);
   },
@@ -122,6 +161,10 @@ server.listen();
 
 console.log("🚀 Hocuspocus server kører på ws://localhost:1234");
 
+/**
+ * Graceful shutdown.
+ * Saves pending changes before the server closes.
+ */
 async function shutdown() {
   console.log("\n🛑 Shutting down...");
 

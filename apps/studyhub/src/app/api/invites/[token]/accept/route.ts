@@ -11,16 +11,32 @@ import {
 
 import { and, eq } from "drizzle-orm";
 
+/**
+ * Dynamic route parameter:
+ * /api/invites/[token]/accept
+ */
 type RouteContext = {
   params: Promise<{ token: string }>;
 };
 
+/**
+ * POST /api/invites/[token]/accept
+ *
+ * Accepts an invite link and gives the current user
+ * persistent access to the shared note.
+ */
 export async function POST(
   _req: Request,
   { params }: RouteContext,
 ) {
+  /**
+   * Get authenticated session
+   */
   const session = await auth();
 
+  /**
+   * Only logged-in users can accept invitations
+   */
   if (!session?.user?.id) {
     return NextResponse.json(
       { error: "Unauthorized" },
@@ -28,8 +44,14 @@ export async function POST(
     );
   }
 
+  /**
+   * Extract invite token from the URL
+   */
   const { token } = await params;
 
+  /**
+   * Find invite by token
+   */
   const invite = await db.query.noteInvites.findFirst({
     where: eq(noteInvites.token, token),
   });
@@ -41,6 +63,9 @@ export async function POST(
     );
   }
 
+  /**
+   * Find the note connected to the invite
+   */
   const note = await db.query.notes.findFirst({
     where: eq(notes.id, invite.noteId),
   });
@@ -54,6 +79,10 @@ export async function POST(
 
   const userId = session.user.id;
 
+  /**
+   * If the owner opens their own invite,
+   * no collaborator relation is needed.
+   */
   if (note.ownerId === userId) {
     return NextResponse.json({
       noteId: note.id,
@@ -61,6 +90,10 @@ export async function POST(
     });
   }
 
+  /**
+   * Check if the user is already a collaborator
+   * to avoid duplicate relations.
+   */
   const existingCollaborator =
     await db.query.noteCollaborators.findFirst({
       where: and(
@@ -69,6 +102,10 @@ export async function POST(
       ),
     });
 
+  /**
+   * Add user as collaborator if relation does not exist.
+   * This controls access to the note.
+   */
   if (!existingCollaborator) {
     await db.insert(noteCollaborators).values({
       noteId: note.id,
@@ -77,6 +114,10 @@ export async function POST(
     });
   }
 
+  /**
+   * Check if the note is already visible
+   * in the user's workspace.
+   */
   const existingPlacement =
     await db.query.notePlacements.findFirst({
       where: and(
@@ -85,6 +126,10 @@ export async function POST(
       ),
     });
 
+  /**
+   * Add note to the user's workspace as unsorted.
+   * This controls where the note appears in the UI.
+   */
   if (!existingPlacement) {
     await db.insert(notePlacements).values({
       noteId: note.id,
@@ -93,6 +138,10 @@ export async function POST(
     });
   }
 
+  /**
+   * Return note id so frontend can redirect
+   * the user to the shared note.
+   */
   return NextResponse.json({
     noteId: note.id,
     success: true,

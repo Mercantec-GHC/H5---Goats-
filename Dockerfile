@@ -1,0 +1,16 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY apps/studyhub/package*.json ./apps/studyhub/
+COPY apps/collab-server/package*.json ./apps/collab-server/
+COPY packages/db/package*.json ./packages/db/
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build --workspace=studyhub
+
+EXPOSE 3000
