@@ -14,3 +14,5 @@ COPY . .
 RUN npm run build --workspace=studyhub
 
 EXPOSE 3000
+
+CMD ["npm", "run", "start", "--workspace=studyhub"]
