@@ -45,12 +45,52 @@ services:
 
       - "127.0.0.1:8080:3000"
 
+    environment:
+
+      REDIS_URL: redis://dokploy-redis:6379
+
+    depends_on:
+
+      - dokploy-postgres
+
+      - dokploy-redis
+
     volumes:
 
       - /var/run/docker.sock:/var/run/docker.sock
 
       - dokploy-data:/data
 
+  dokploy-postgres:
+
+    image: postgres:15
+
+    container_name: dokploy-postgres
+
+    restart: unless-stopped
+
+    environment:
+
+      POSTGRES_USER: dokploy
+
+      POSTGRES_PASSWORD: dokploy
+
+      POSTGRES_DB: dokploy
+
+    volumes:
+
+      - dokploy-postgres:/var/lib/postgresql/data
+
+  dokploy-redis:
+
+    image: redis:7-alpine
+
+    container_name: dokploy-redis
+
+    restart: unless-stopped
+
 volumes:
 
   dokploy-data:
+
+  dokploy-postgres:
