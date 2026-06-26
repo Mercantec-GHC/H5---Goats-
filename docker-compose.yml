@@ -49,7 +49,7 @@ services:
 
       REDIS_URL: redis://dokploy-redis:6379
 
-      BETTER_AUTH_SECRET: supersecret123
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
 
       DATABASE_URL: postgres://dokploy:dokploy@dokploy-postgres:5432/dokploy
 
@@ -75,11 +75,11 @@ services:
 
     environment:
 
-      POSTGRES_USER: dokploy
+      POSTGRES_USER: ${POSTGRES_USER}
 
-      POSTGRES_PASSWORD: dokploy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-      POSTGRES_DB: dokploy
+      POSTGRES_DB: ${POSTGRES_DB}
 
     volumes:
 
