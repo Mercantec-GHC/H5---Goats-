@@ -51,7 +51,7 @@ services:
 
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
 
-      DATABASE_URL2: ${DATABASE_URL}
+      DATABASE_URL2: ${DATABASE_URL2}
 
     depends_on:
 
