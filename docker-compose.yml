@@ -51,7 +51,7 @@ services:
 
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
 
-      DATABASE_URL: postgres://dokploy:dokploy@dokploy-postgres:5432/dokploy
+      DATABASE_URL2: ${DATABASE_URL}
 
     depends_on:
 
