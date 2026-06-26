@@ -49,6 +49,10 @@ services:
 
       REDIS_URL: redis://dokploy-redis:6379
 
+      BETTER_AUTH_SECRET: supersecret123
+
+      DATABASE_URL: postgres://dokploy:dokploy@dokploy-postgres:5432/dokploy
+
     depends_on:
 
       - dokploy-postgres
