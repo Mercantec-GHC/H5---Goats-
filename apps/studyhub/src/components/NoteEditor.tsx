@@ -7,10 +7,14 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import * as Y from "yjs";
+
 import styles from "./NoteEditor.module.css";
+
 import { createProvider } from "@/lib/collab/createProvider";
 import { createYDoc } from "@/lib/collab/createYDoc";
+
 import OnlineUsers from "@/components/OnlineUsers";
+import EditorToolbar from "@/components/EditorToolbar";
 
 type NoteEditorUser = {
   name: string;
@@ -55,55 +59,7 @@ function CollaborativeEditor({
 
   return (
     <div className={styles.editorShell}>
-      <div className={styles.toolbar}>
-        <button
-          type="button"
-          className={
-            editor.isActive("bold") ? styles.activeButton : styles.toolbarButton
-          }
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          B
-        </button>
-
-        <button
-          type="button"
-          className={
-            editor.isActive("italic")
-              ? styles.activeButton
-              : styles.toolbarButton
-          }
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
-          I
-        </button>
-
-        <button
-          type="button"
-          className={
-            editor.isActive("heading", { level: 2 })
-              ? styles.activeButton
-              : styles.toolbarButton
-          }
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-        >
-          H2
-        </button>
-
-        <button
-          type="button"
-          className={
-            editor.isActive("bulletList")
-              ? styles.activeButton
-              : styles.toolbarButton
-          }
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        >
-          • List
-        </button>
-      </div>
+      <EditorToolbar editor={editor} />
 
       <EditorContent editor={editor} className={styles.editor} />
     </div>
