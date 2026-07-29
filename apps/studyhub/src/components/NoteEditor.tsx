@@ -5,16 +5,24 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
+import Link from "@tiptap/extension-link";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import * as Y from "yjs";
 
-import styles from "./NoteEditor.module.css";
+import BubbleToolbar from "@/components/BubbleToolbar";
+import EditorToolbar from "@/components/EditorToolbar";
+import OnlineUsers from "@/components/OnlineUsers";
 
 import { createProvider } from "@/lib/collab/createProvider";
 import { createYDoc } from "@/lib/collab/createYDoc";
 
-import OnlineUsers from "@/components/OnlineUsers";
-import EditorToolbar from "@/components/EditorToolbar";
+import { ClearLinkOnDelete } from "@/extensions/ClearLinkOnDelete";
+
+import styles from "./NoteEditor.module.css";
+
+const CustomLink = Link.extend({
+  exitable: true,
+});
 
 type NoteEditorUser = {
   name: string;
@@ -41,15 +49,28 @@ function CollaborativeEditor({
         StarterKit.configure({
           undoRedo: false,
         }),
+
         Collaboration.configure({
           document: ydoc,
           field: "default",
         }),
+
         CollaborationCaret.configure({
           provider,
           user,
         }),
+
+        Link.configure({
+          openOnClick: true,
+
+          autolink: true,
+
+          defaultProtocol: "https",
+        }),
+
+        ClearLinkOnDelete,
       ],
+
       immediatelyRender: false,
     },
     [ydoc, provider, user],
@@ -60,7 +81,7 @@ function CollaborativeEditor({
   return (
     <div className={styles.editorShell}>
       <EditorToolbar editor={editor} />
-
+      <BubbleToolbar editor={editor} />
       <EditorContent editor={editor} className={styles.editor} />
     </div>
   );
