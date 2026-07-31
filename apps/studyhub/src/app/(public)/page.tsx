@@ -77,7 +77,7 @@ export default function LandingPage() {
       <header className={styles.header}>
         <Link href="/" className={styles.brand}>
           <Image
-            src="/duck-logo.png"
+            src="/studylogo.png"
             width={48}
             height={48}
             alt="StudyHub duck logo"
@@ -235,10 +235,10 @@ export default function LandingPage() {
           </div>
 
           <Image
-            src="/studyducks-mascot.png"
+            src="/studymascot.png"
             width={560}
             height={560}
-            alt="StudyDucks mascot studying"
+            alt="StudyDocs mascot studying"
             className={styles.mascot}
             priority
           />
@@ -270,7 +270,7 @@ export default function LandingPage() {
 
       <section className={styles.closingMessage}>
         <Image
-          src="/duck-logo.png"
+          src="/studylogo.png"
           width={54}
           height={54}
           alt=""
