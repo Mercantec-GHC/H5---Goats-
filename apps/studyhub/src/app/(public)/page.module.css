@@ -450,7 +450,7 @@
 
 .mascot {
   position: absolute;
-  left: 20%;
+  left: 25%;
   bottom: -4px;
   z-index: 5;
   width: min(500px, 60%);
@@ -708,8 +708,8 @@
   }
 
   .mascot {
-    left: 13%;
-    width: 76%;
+    left: 25%;
+    width: 75%;
   }
 
   .commentBubble,

@@ -76,18 +76,15 @@ export default function LandingPage() {
     <main className={styles.page}>
       <header className={styles.header}>
         <Link href="/" className={styles.brand}>
-          <Image
-            src="/studylogo.png"
-            width={48}
-            height={48}
-            alt="StudyHub duck logo"
-            className={styles.logo}
-            priority
-          />
+<Image
+  src="/images/studydocslogo.png"
+  alt="StudyDocs"
+  width={200}
+  height={140}
+  priority
+/>
 
-          <span className={styles.brandText}>
-            Study<span>Hub</span>
-          </span>
+
         </Link>
 
         <nav className={styles.navigation} aria-label="Primary navigation">
@@ -123,7 +120,7 @@ export default function LandingPage() {
           </h1>
 
           <p className={styles.heroDescription}>
-            StudyHub is the perfect blend of OneNote&apos;s organization and
+            StudyDocs is the perfect blend of OneNote&apos;s organization and
             Google Docs&apos; collaboration. Built for students, by students.
           </p>
 
@@ -161,7 +158,7 @@ export default function LandingPage() {
           <div className={styles.sidebarMockup}>
             <div className={styles.mockupBrand}>
               <span>♙</span>
-              StudyHub
+              StudyDocs
             </div>
 
             <button type="button" className={styles.newButton}>
@@ -169,7 +166,7 @@ export default function LandingPage() {
             </button>
 
             <div className={styles.mockupMenu}>
-              <p>▧ &nbsp; My Hub</p>
+              <p>▧ &nbsp; My Docs</p>
               <p className={styles.menuTitle}>▾ &nbsp; 📚 Courses</p>
               <p>▾ &nbsp; Computer Science</p>
               <p className={styles.activeMenuItem}>▸ &nbsp; Notes</p>
@@ -235,7 +232,7 @@ export default function LandingPage() {
           </div>
 
           <Image
-            src="/studymascot.png"
+            src="/images/studydocsmascot.png"
             width={560}
             height={560}
             alt="StudyDocs mascot studying"
@@ -270,15 +267,15 @@ export default function LandingPage() {
 
       <section className={styles.closingMessage}>
         <Image
-          src="/studylogo.png"
-          width={54}
-          height={54}
+          src="/images/studydocslogo.png"
+          width={200}
+          height={140}
           alt=""
           className={styles.closingLogo}
         />
 
         <div>
-          <p>StudyHub is more than a tool. It&apos;s your learning hub.</p>
+          <p>StudyDocs is more than a tool. It&apos;s your learning hub.</p>
           <strong>Stay organized. Stay productive. Stay in the hub.</strong>
         </div>
       </section>
