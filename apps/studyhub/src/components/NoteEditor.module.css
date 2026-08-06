@@ -171,3 +171,160 @@
 .editor :global(.tiptap a:hover) {
   text-decoration-thickness: 2px;
 }
+
+.editor :global(.ProseMirror mark) {
+  background-color: red;
+  color: inherit;
+  padding: 0 0.1em;
+  border-radius: 0.2em;
+}
+
+/* =========================
+   Tables
+========================= */
+
+.editor :global(.ProseMirror table) {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.editor :global(.ProseMirror th),
+.editor :global(.ProseMirror td) {
+  position: relative;
+  min-width: 120px;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  vertical-align: top;
+  text-align: left;
+}
+
+.editor :global(.ProseMirror th) {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.editor :global(.ProseMirror td:hover),
+.editor :global(.ProseMirror th:hover) {
+  background-color: #fafafa;
+}
+
+.editor :global(.ProseMirror td p),
+.editor :global(.ProseMirror th p) {
+  margin: 0;
+}
+
+.editor :global(.ProseMirror .selectedCell) {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.editor :global(.ProseMirror .column-resize-handle) {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 4px;
+  height: 100%;
+  background-color: #3b82f6;
+  pointer-events: none;
+}
+
+.editor :global(.ProseMirror tableWrapper) {
+  overflow-x: auto;
+}
+
+.tableFloatingToolbar {
+  display: flex;
+  flex-direction: column;
+  width: 118px;
+  padding: 6px;
+
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 12%);
+}
+
+.tableToolbarGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tableToolbarLabel {
+  padding: 4px 8px 3px;
+
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tableActionButton {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.tableActionButton:hover {
+  background: #f3f4f6;
+}
+
+.tableActionButton:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.tableToolbarDivider {
+  height: 1px;
+  margin: 5px 4px;
+
+  background: #e5e7eb;
+}
+
+.deleteButton {
+  color: #dc2626;
+}
+
+.deleteButton:hover {
+  background: #fef2f2;
+}
+
+.separator {
+  width: 1px;
+  align-self: stretch;
+  background: #e5e7eb;
+  margin: 0 4px;
+}
+
+.toolbarError {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+
+  color: #b91c1c;
+  background: #fef2f2;
+  border-bottom: 1px solid #fecaca;
+
+  font-size: 0.85rem;
+}

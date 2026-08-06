@@ -6,23 +6,26 @@ import StarterKit from "@tiptap/starter-kit";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import Link from "@tiptap/extension-link";
+import Underline from "@tiptap/extension-underline";
+import Highlight from "@tiptap/extension-highlight";
+import Image from "@tiptap/extension-image";
+import { Table } from "@tiptap/extension-table";
+import { TableRow } from "@tiptap/extension-table-row";
+import { TableCell } from "@tiptap/extension-table-cell";
+import { TableHeader } from "@tiptap/extension-table-header";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import * as Y from "yjs";
 
 import BubbleToolbar from "@/components/BubbleToolbar";
 import EditorToolbar from "@/components/EditorToolbar";
 import OnlineUsers from "@/components/OnlineUsers";
+import TableBubbleToolbar from "@/components/TableBubbleToolbar";
 
 import { createProvider } from "@/lib/collab/createProvider";
 import { createYDoc } from "@/lib/collab/createYDoc";
-
 import { ClearLinkOnDelete } from "@/extensions/ClearLinkOnDelete";
 
 import styles from "./NoteEditor.module.css";
-
-const CustomLink = Link.extend({
-  exitable: true,
-});
 
 type NoteEditorUser = {
   name: string;
@@ -34,20 +37,26 @@ type NoteEditorProps = {
   user: NoteEditorUser;
 };
 
-function CollaborativeEditor({
-  ydoc,
-  provider,
-  user,
-}: {
+type CollaborativeEditorProps = {
+  noteId: string;
   ydoc: Y.Doc;
   provider: HocuspocusProvider;
   user: NoteEditorUser;
-}) {
+};
+
+function CollaborativeEditor({
+  noteId,
+  ydoc,
+  provider,
+  user,
+}: CollaborativeEditorProps) {
   const editor = useEditor(
     {
       extensions: [
         StarterKit.configure({
           undoRedo: false,
+          link: false,
+          underline: false,
         }),
 
         Collaboration.configure({
@@ -62,11 +71,26 @@ function CollaborativeEditor({
 
         Link.configure({
           openOnClick: true,
-
           autolink: true,
-
           defaultProtocol: "https",
         }),
+
+        Underline,
+
+        Highlight,
+
+        Image.configure({
+          inline: false,
+          allowBase64: false,
+        }),
+
+        Table.configure({
+          resizable: true,
+        }),
+
+        TableRow,
+        TableHeader,
+        TableCell,
 
         ClearLinkOnDelete,
       ],
@@ -76,12 +100,18 @@ function CollaborativeEditor({
     [ydoc, provider, user],
   );
 
-  if (!editor) return null;
+  if (!editor) {
+    return null;
+  }
 
   return (
     <div className={styles.editorShell}>
-      <EditorToolbar editor={editor} />
+      <EditorToolbar editor={editor} noteId={noteId} />
+
+      <TableBubbleToolbar editor={editor} />
+
       <BubbleToolbar editor={editor} />
+
       <EditorContent editor={editor} className={styles.editor} />
     </div>
   );
@@ -101,6 +131,7 @@ export default function NoteEditor({ noteId, user }: NoteEditorProps) {
     return () => {
       hocuspocusProvider.destroy();
       doc.destroy();
+
       setYdoc(null);
       setProvider(null);
     };
@@ -116,7 +147,12 @@ export default function NoteEditor({ noteId, user }: NoteEditorProps) {
         <OnlineUsers provider={provider} />
       </div>
 
-      <CollaborativeEditor ydoc={ydoc} provider={provider} user={user} />
+      <CollaborativeEditor
+        noteId={noteId}
+        ydoc={ydoc}
+        provider={provider}
+        user={user}
+      />
     </div>
   );
 }

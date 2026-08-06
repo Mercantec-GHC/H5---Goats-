@@ -2,7 +2,15 @@
 
 import type { Editor } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
-import { Bold, Italic, Strikethrough, Link2, Unlink } from "lucide-react";
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  Highlighter,
+  Link2,
+  Unlink,
+} from "lucide-react";
 
 import styles from "./NoteEditor.module.css";
 
@@ -47,7 +55,7 @@ export default function BubbleToolbar({ editor }: Props) {
       return;
     }
 
-    const { from, to, empty } = editor.state.selection;
+    const { to, empty } = editor.state.selection;
 
     if (empty) {
       return;
@@ -79,9 +87,17 @@ export default function BubbleToolbar({ editor }: Props) {
       shouldShow={({ editor, state }) => {
         const { from, to, empty } = state.selection;
 
-        return (
-          editor.isEditable && !empty && from !== to && editor.view.hasFocus()
-        );
+        if (!editor.isEditable || empty || from === to) {
+          return false;
+        }
+
+        if (!editor.view.hasFocus()) {
+          return false;
+        }
+
+        const selectedText = state.doc.textBetween(from, to, " ").trim();
+
+        return selectedText.length > 0;
       }}
     >
       <div className={styles.bubbleToolbar}>
@@ -107,12 +123,32 @@ export default function BubbleToolbar({ editor }: Props) {
 
         <button
           type="button"
+          className={buttonClass(editor.isActive("underline"))}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          aria-label="Underline"
+          title="Underline"
+        >
+          <UnderlineIcon size={16} />
+        </button>
+
+        <button
+          type="button"
           className={buttonClass(editor.isActive("strike"))}
           onClick={() => editor.chain().focus().toggleStrike().run()}
           aria-label="Strikethrough"
           title="Strikethrough"
         >
           <Strikethrough size={16} />
+        </button>
+
+        <button
+          type="button"
+          className={buttonClass(editor.isActive("highlight"))}
+          onClick={() => editor.chain().focus().toggleHighlight().run()}
+          aria-label="Highlight"
+          title="Highlight"
+        >
+          <Highlighter size={16} />
         </button>
 
         <span className={styles.separator} />

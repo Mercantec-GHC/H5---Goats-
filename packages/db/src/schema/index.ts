@@ -6,3 +6,4 @@ export * from "./noteCollaborators";
 export * from "./notePlacements";
 export * from "./relations";
 export * from "./noteInvites";
+export * from "./noteImages";
