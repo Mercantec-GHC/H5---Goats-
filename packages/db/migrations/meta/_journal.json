@@ -15,6 +15,13 @@
       "when": 1785931813109,
       "tag": "0001_soft_doomsday",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786382020863,
+      "tag": "0002_worried_odin",
+      "breakpoints": true
     }
   ]
 }

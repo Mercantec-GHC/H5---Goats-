@@ -54,6 +54,10 @@ export const noteImages = pgTable(
 
     height: integer("height"),
 
+    deletedAt: timestamp("deleted_at", {
+  withTimezone: true,
+}), 
+
     createdAt: timestamp("created_at", {
       withTimezone: true,
     })

@@ -91,7 +91,7 @@ export default function BubbleToolbar({ editor }: Props) {
           return false;
         }
 
-        if (!editor.view.hasFocus()) {
+        if (editor.isDestroyed || !editor.isFocused) {
           return false;
         }
 

@@ -9,45 +9,66 @@
 }
 
 .editorShell {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
+
+/* =========================
+   Main toolbar
+========================= */
 
 .toolbar {
   display: flex;
+  align-items: center;
   gap: 0.4rem;
+
   padding: 0.5rem;
-  border-bottom: 1px solid var(--border);
+
   background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
 }
 
 .toolbarButton,
 .activeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   appearance: none;
   -webkit-appearance: none;
 
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-
+  min-height: 32px;
   padding: 0.35rem 0.6rem;
 
   background: #ffffff;
   color: #111827;
 
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+
   font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1;
 
   cursor: pointer;
+
   transition:
     background-color 0.15s ease,
     color 0.15s ease,
-    border-color 0.15s ease;
+    border-color 0.15s ease,
+    opacity 0.15s ease;
 }
 
-.toolbarButton:hover {
+.toolbarButton:hover:not(:disabled) {
   background: #f3f4f6;
+}
+
+.toolbarButton:disabled,
+.activeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .activeButton {
@@ -56,15 +77,55 @@
   border-color: var(--primary);
 }
 
+.toolbarSelect {
+  height: 32px;
+  padding: 0 10px;
+
+  background: #ffffff;
+
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+
+  color: #111827;
+  font-size: 14px;
+}
+
+.separator {
+  width: 1px;
+  align-self: stretch;
+
+  margin: 0 4px;
+
+  background: #e5e7eb;
+}
+
+.toolbarError {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+
+  color: #b91c1c;
+  background: #fef2f2;
+
+  border-bottom: 1px solid #fecaca;
+
+  font-size: 0.85rem;
+}
+
+/* =========================
+   Editor
+========================= */
+
 .editor {
   min-height: 420px;
   padding: 1rem;
+
   background: #ffffff;
   color: #111827;
 }
 
 .editor :global(.ProseMirror) {
   min-height: 420px;
+
   outline: none;
   color: #111827;
 }
@@ -77,54 +138,63 @@
   color: #111827;
 }
 
+/* =========================
+   Collaboration carets
+========================= */
+
 .editor :global(.collaboration-carets__caret) {
-  border-left: 2px solid currentColor;
+  position: relative;
+
   margin-left: -1px;
   margin-right: -1px;
+
+  border-left: 2px solid currentColor;
+
   pointer-events: none;
-  position: relative;
 }
 
 .editor :global(.collaboration-carets__caret)::after {
   content: "";
+
   position: absolute;
   top: -2px;
   left: -3px;
+
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+
   background: currentColor;
+  border-radius: 999px;
 }
 
 .editor :global(.collaboration-carets__label) {
   position: absolute;
   top: -1.45rem;
   left: -2px;
+  z-index: 20;
 
   padding: 0.22rem 0.45rem;
+
+  color: #ffffff;
+  background: currentColor;
+
   border-radius: 4px 4px 4px 0;
 
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1;
 
-  color: #ffffff;
   white-space: nowrap;
+
   user-select: none;
   pointer-events: none;
 
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-  z-index: 20;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 18%);
 }
 
-.toolbarSelect {
-  height: 32px;
-  padding: 0 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: white;
-  font-size: 14px;
-}
+/* =========================
+   Text bubble toolbar
+========================= */
 
 .bubbleToolbar {
   display: flex;
@@ -134,18 +204,29 @@
   padding: 6px;
 
   background: #ffffff;
+
   border: 1px solid #e5e7eb;
   border-radius: 10px;
 
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 15%);
 
   animation: bubbleFade 150ms ease;
+}
+
+.bubbleToolbar .toolbarButton,
+.bubbleToolbar .activeButton {
+  width: 34px;
+  height: 34px;
+  padding: 0;
 }
 
 .bubbleToolbar .separator {
   width: 1px;
   height: 20px;
+  align-self: auto;
+
   margin: 0 3px;
+
   background: #e5e7eb;
 }
 
@@ -161,10 +242,15 @@
   }
 }
 
+/* =========================
+   Links / highlights
+========================= */
+
 .editor :global(.tiptap a) {
   color: #2563eb;
   text-decoration: underline;
   text-underline-offset: 2px;
+
   cursor: pointer;
 }
 
@@ -173,9 +259,11 @@
 }
 
 .editor :global(.ProseMirror mark) {
+  padding: 0 0.1em;
+
   background-color: red;
   color: inherit;
-  padding: 0 0.1em;
+
   border-radius: 0.2em;
 }
 
@@ -185,18 +273,23 @@
 
 .editor :global(.ProseMirror table) {
   width: 100%;
+  margin: 1rem 0;
+
   border-collapse: collapse;
   table-layout: fixed;
-  margin: 1rem 0;
+
   overflow: hidden;
 }
 
 .editor :global(.ProseMirror th),
 .editor :global(.ProseMirror td) {
   position: relative;
+
   min-width: 120px;
   padding: 0.75rem;
+
   border: 1px solid #d1d5db;
+
   vertical-align: top;
   text-align: left;
 }
@@ -216,33 +309,57 @@
   margin: 0;
 }
 
+.editor :global(.ProseMirror td ol),
+.editor :global(.ProseMirror th ol),
+.editor :global(.ProseMirror td ul),
+.editor :global(.ProseMirror th ul) {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 1.5rem;
+}
+
+.editor :global(.ProseMirror td li),
+.editor :global(.ProseMirror th li) {
+  margin: 0;
+}
+
 .editor :global(.ProseMirror .selectedCell) {
-  background-color: rgba(59, 130, 246, 0.15);
+  background-color: rgb(59 130 246 / 15%);
 }
 
 .editor :global(.ProseMirror .column-resize-handle) {
   position: absolute;
   top: 0;
   right: -2px;
+
   width: 4px;
   height: 100%;
+
   background-color: #3b82f6;
+
   pointer-events: none;
 }
 
-.editor :global(.ProseMirror tableWrapper) {
+.editor :global(.ProseMirror .tableWrapper) {
   overflow-x: auto;
 }
+
+/* =========================
+   Table floating toolbar
+========================= */
 
 .tableFloatingToolbar {
   display: flex;
   flex-direction: column;
+
   width: 118px;
   padding: 6px;
 
-  background: white;
+  background: #ffffff;
+
   border: 1px solid #d1d5db;
   border-radius: 10px;
+
   box-shadow: 0 6px 18px rgb(0 0 0 / 12%);
 }
 
@@ -256,6 +373,7 @@
   padding: 4px 8px 3px;
 
   color: #9ca3af;
+
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -271,23 +389,25 @@
   height: 32px;
   padding: 0 8px;
 
-  border: none;
-  border-radius: 6px;
-
   background: transparent;
   color: #374151;
 
+  border: none;
+  border-radius: 6px;
+
   font-size: 13px;
   font-weight: 500;
+
   white-space: nowrap;
 
   cursor: pointer;
+
   transition:
     background-color 120ms ease,
     color 120ms ease;
 }
 
-.tableActionButton:hover {
+.tableActionButton:hover:not(:disabled) {
   background: #f3f4f6;
 }
 
@@ -296,8 +416,17 @@
   outline-offset: 1px;
 }
 
+.tableActionButton:disabled {
+  color: #9ca3af;
+  background: transparent;
+
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .tableToolbarDivider {
   height: 1px;
+
   margin: 5px 4px;
 
   background: #e5e7eb;
@@ -307,24 +436,249 @@
   color: #dc2626;
 }
 
-.deleteButton:hover {
+.deleteButton:hover:not(:disabled) {
   background: #fef2f2;
 }
 
-.separator {
-  width: 1px;
-  align-self: stretch;
-  background: #e5e7eb;
-  margin: 0 4px;
+/* =========================
+   Images
+========================= */
+
+.editor :global(.ProseMirror img) {
+  display: block;
+
+  max-width: 100%;
+  height: auto;
+
+  margin: 0;
+
+  border-radius: 8px;
+
+  transition:
+    box-shadow 150ms ease,
+    filter 150ms ease;
 }
 
-.toolbarError {
-  margin: 0;
-  padding: 0.5rem 0.75rem;
+/*
+ * Markeret billede
+ */
+.editor :global(.ProseMirror img.ProseMirror-selectednode),
+.editor :global(.ProseMirror .ProseMirror-selectednode img) {
+  box-shadow:
+    0 0 0 1.5px #3b82f6,
+    0 8px 24px rgb(37 99 235 / 14%);
+}
 
+/*
+ * Tiptaps ydre resize-container.
+ *
+ * Den fylder hele rækken og styrer:
+ * - spacing mellem billeder / tekst
+ * - left / center / right alignment
+ */
+.editor :global(.ProseMirror [data-resize-container]) {
+  display: flex;
+
+  width: 100%;
+  max-width: 100%;
+
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/*
+ * Denne wrapper ligger præcist omkring billedet.
+ * Handles positioneres relativt til denne wrapper.
+ */
+.editor :global(.ProseMirror [data-resize-wrapper]) {
+  position: relative;
+
+  display: block;
+
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * Almindeligt billede uden resize-container.
+ */
+.editor
+  :global(
+    .ProseMirror img[data-alignment="left"]:not([data-resize-wrapper] img)
+  ) {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.editor
+  :global(
+    .ProseMirror img[data-alignment="center"]:not([data-resize-wrapper] img)
+  ) {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.editor
+  :global(
+    .ProseMirror img[data-alignment="right"]:not([data-resize-wrapper] img)
+  ) {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/*
+ * Resizable image alignment.
+ *
+ * data-resize-container fylder hele rækken.
+ * data-resize-wrapper + image flyttes derfor
+ * med justify-content.
+ */
+.editor
+  :global(
+    .ProseMirror [data-resize-container]:has(img[data-alignment="left"])
+  ) {
+  justify-content: flex-start;
+}
+
+.editor
+  :global(
+    .ProseMirror [data-resize-container]:has(img[data-alignment="center"])
+  ) {
+  justify-content: center;
+}
+
+.editor
+  :global(
+    .ProseMirror [data-resize-container]:has(img[data-alignment="right"])
+  ) {
+  justify-content: flex-end;
+}
+
+/*
+ * Fælles styling for alle fire resize handles.
+ */
+.editor :global(.ProseMirror [data-resize-handle]) {
+  position: absolute !important;
+
+  width: 10px !important;
+  height: 10px !important;
+
+  box-sizing: border-box;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  background: #ffffff !important;
+
+  border: 2px solid #2563eb !important;
+  border-radius: 3px !important;
+
+  box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+
+  z-index: 50;
+}
+
+/*
+ * Handles placeres direkte på billedets hjørner.
+ *
+ * 10px handle -> -5px betyder, at halvdelen ligger
+ * indenfor billedet og halvdelen udenfor.
+ */
+.editor :global(.ProseMirror [data-resize-handle="top-left"]) {
+  top: -5px !important;
+  left: -5px !important;
+
+  cursor: nwse-resize;
+}
+
+.editor :global(.ProseMirror [data-resize-handle="top-right"]) {
+  top: -5px !important;
+  right: -5px !important;
+
+  cursor: nesw-resize;
+}
+
+.editor :global(.ProseMirror [data-resize-handle="bottom-left"]) {
+  bottom: -5px !important;
+  left: -5px !important;
+
+  cursor: nesw-resize;
+}
+
+.editor :global(.ProseMirror [data-resize-handle="bottom-right"]) {
+  right: -5px !important;
+  bottom: -5px !important;
+
+  cursor: nwse-resize;
+}
+
+/* =========================
+   Image floating toolbar
+========================= */
+
+.imageFloatingToolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  padding: 4px;
+
+  background: rgb(255 255 255 / 96%);
+  backdrop-filter: blur(8px);
+
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 10%),
+    0 1px 2px rgb(0 0 0 / 6%);
+
+  animation: imageToolbarIn 120ms ease;
+}
+
+.imageFloatingToolbar .toolbarButton,
+.imageFloatingToolbar .activeButton {
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+
+  padding: 0;
+
+  border-radius: 5px;
+}
+
+.imageFloatingToolbar .separator {
+  width: 1px;
+  height: 20px;
+
+  margin: 0 3px;
+
+  background: #e5e7eb;
+}
+
+.imageFloatingToolbar svg {
+  display: block;
+}
+
+.imageDeleteButton {
+  color: #dc2626;
+}
+
+.imageDeleteButton:hover {
   color: #b91c1c;
   background: #fef2f2;
-  border-bottom: 1px solid #fecaca;
+  border-color: #fecaca;
+}
 
-  font-size: 0.85rem;
+@keyframes imageToolbarIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

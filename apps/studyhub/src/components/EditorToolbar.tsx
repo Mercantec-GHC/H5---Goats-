@@ -13,31 +13,14 @@ import {
   Undo2,
 } from "lucide-react";
 
+import { uploadNoteImage } from "@/lib/images/uploadNoteImage";
+
 import styles from "./NoteEditor.module.css";
 
 type Props = {
   editor: Editor;
   noteId: string;
 };
-
-type UploadResponse = {
-  image?: {
-    id: string;
-    url: string;
-    originalName: string;
-    altText: string;
-  };
-  error?: string;
-};
-
-const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
-
-const ALLOWED_IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
 
 export default function EditorToolbar({ editor, noteId }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,10 +125,6 @@ export default function EditorToolbar({ editor, noteId }: Props) {
   ) => {
     const file = event.target.files?.[0];
 
-    /*
-     * Nulstil inputtet med det samme. Så kan brugeren vælge
-     * den samme fil igen efter en eventuel fejl.
-     */
     event.target.value = "";
 
     if (!file || editor.isDestroyed) {
@@ -153,44 +132,10 @@ export default function EditorToolbar({ editor, noteId }: Props) {
     }
 
     setImageUploadError("");
-
-    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
-      setImageUploadError("Kun JPEG, PNG, WebP og GIF er tilladt.");
-      return;
-    }
-
-    if (file.size === 0) {
-      setImageUploadError("Den valgte fil er tom.");
-      return;
-    }
-
-    if (file.size > MAX_IMAGE_SIZE) {
-      setImageUploadError("Billedet må højst fylde 8 MB.");
-      return;
-    }
-
-    const formData = new FormData();
-
-    formData.append("file", file);
-    formData.append("altText", file.name);
-
     setIsUploadingImage(true);
 
     try {
-      const response = await fetch(`/api/notes/${noteId}/images`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = (await response.json()) as UploadResponse;
-
-      if (!response.ok) {
-        throw new Error(data.error ?? "Billedet kunne ikke uploades.");
-      }
-
-      if (!data.image?.url) {
-        throw new Error("Upload-endpointet returnerede ingen billed-URL.");
-      }
+      const image = await uploadNoteImage(noteId, file);
 
       if (editor.isDestroyed) {
         return;
@@ -199,10 +144,15 @@ export default function EditorToolbar({ editor, noteId }: Props) {
       const inserted = editor
         .chain()
         .focus()
-        .setImage({
-          src: data.image.url,
-          alt: data.image.altText || data.image.originalName || file.name,
-          title: data.image.originalName || file.name,
+        .insertContent({
+          type: "image",
+          attrs: {
+            src: image.url,
+            imageId: image.id,
+            alt: image.altText || image.originalName || file.name,
+            title: image.originalName || file.name,
+            alignment: "center",
+          },
         })
         .run();
 
@@ -383,7 +333,8 @@ export default function EditorToolbar({ editor, noteId }: Props) {
 
             table,
             blockquote,
-            pre {
+            pre,
+            img {
               break-inside: avoid;
             }
 
