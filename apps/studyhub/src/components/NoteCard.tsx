@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import styles from "./NoteCard.module.css";
 import { Trash2 } from "lucide-react";
+
+import styles from "./NoteCard.module.css";
 
 type NoteCardProps = {
   id: string;
   title: string;
+  previewImageUrl?: string | null;
   topicTitle?: string | null;
   updatedAt?: string | Date;
 };
@@ -14,6 +16,7 @@ type NoteCardProps = {
 export default function NoteCard({
   id,
   title,
+  previewImageUrl,
   topicTitle,
   updatedAt,
 }: NoteCardProps) {
@@ -21,31 +24,55 @@ export default function NoteCard({
     ? new Date(updatedAt).toLocaleDateString("da-DK")
     : "";
 
-  const deleteNote = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const deleteNote = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-    const confirmed = confirm("Er du sikker på at du vil slette noten?");
+    const confirmed = window.confirm("Er du sikker på at du vil slette noten?");
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
-    await fetch(`/api/notes/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      const response = await fetch(`/api/notes/${id}`, {
+        method: "DELETE",
+      });
 
-    window.location.reload();
+      if (!response.ok) {
+        throw new Error("Noten kunne ikke slettes.");
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Note deletion failed:", error);
+
+      window.alert("Noten kunne ikke slettes.");
+    }
   };
 
   return (
     <Link href={`/notes/${id}`} className={styles.card}>
-      <button className={styles.deleteButton} onClick={deleteNote}>
+      <button
+        type="button"
+        className={styles.deleteButton}
+        onClick={deleteNote}
+        aria-label={`Slet ${title}`}
+        title="Slet note"
+      >
         <Trash2 size={16} />
       </button>
 
       <div className={styles.preview}>
-        <div className={styles.line} />
-        <div className={styles.lineShort} />
-        <div className={styles.line} />
+        {previewImageUrl ? (
+          <img src={previewImageUrl} alt="" className={styles.previewImage} />
+        ) : (
+          <div className={styles.previewPlaceholder}>
+            <div className={styles.line} />
+            <div className={styles.lineShort} />
+            <div className={styles.line} />
+          </div>
+        )}
       </div>
 
       <div className={styles.body}>

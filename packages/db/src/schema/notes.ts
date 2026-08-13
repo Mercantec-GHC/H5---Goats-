@@ -19,4 +19,6 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
+
+    previewImageUrl: text("preview_image_url"),
 });

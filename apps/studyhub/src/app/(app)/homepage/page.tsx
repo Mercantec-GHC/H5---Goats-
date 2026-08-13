@@ -54,6 +54,7 @@ export default async function Homepage() {
               key={note.id}
               id={note.id}
               title={note.title}
+              previewImageUrl={note.previewImageUrl}
               topicTitle={
                 note.ownerId !== session.user.id
                   ? "Delt med mig"
@@ -77,6 +78,7 @@ export default async function Homepage() {
                 key={note.id}
                 id={note.id}
                 title={note.title}
+                previewImageUrl={note.previewImageUrl}
                 topicTitle="Delt med mig"
                 updatedAt={note.updatedAt}
               />
@@ -97,6 +99,7 @@ export default async function Homepage() {
                 key={note.id}
                 id={note.id}
                 title={note.title}
+                previewImageUrl={note.previewImageUrl}
                 topicTitle={null}
                 updatedAt={note.updatedAt}
               />

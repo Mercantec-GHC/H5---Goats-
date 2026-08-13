@@ -25,6 +25,7 @@
     "@tiptap/extension-underline": "^3.29.2",
     "@tiptap/react": "^3.29.2",
     "@tiptap/starter-kit": "^3.29.2",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^1.23.0",
     "next": "16.2.4",
     "next-auth": "^4.24.14",

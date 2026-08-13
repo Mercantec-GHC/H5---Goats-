@@ -25,13 +25,27 @@ export async function restoreNoteImage(imageId: string) {
 
   if (!response.ok) {
     const data = (await response.json().catch(() => null)) as
-      | {
-          error?: string;
-        }
+      | { error?: string }
       | null;
 
     throw new Error(
       data?.error ?? "Billedet kunne ikke gendannes.",
+    );
+  }
+}
+
+export async function softDeleteNoteImage(imageId: string) {
+  const response = await fetch(`/api/note-images/${imageId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const data = (await response.json().catch(() => null)) as
+      | { error?: string }
+      | null;
+
+    throw new Error(
+      data?.error ?? "Billedet kunne ikke markeres som slettet.",
     );
   }
 }
