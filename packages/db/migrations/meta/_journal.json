@@ -8,6 +8,27 @@
       "when": 1776798463764,
       "tag": "0000_glorious_harrier",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785931813109,
+      "tag": "0001_soft_doomsday",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786382020863,
+      "tag": "0002_worried_odin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786549017629,
+      "tag": "0003_rapid_mordo",
+      "breakpoints": true
     }
   ]
 }

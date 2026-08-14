@@ -1,0 +1,100 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: studyhub-web
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  collab:
+    build:
+      context: .
+      dockerfile: Dockerfile.collab
+    container_name: studyhub-collab
+    ports:
+      - "1234:1234"
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:1234" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    
+  dokploy:
+
+    image: dokploy/dokploy:latest
+
+    container_name: dokploy
+
+    restart: unless-stopped
+
+    ports:
+
+      - "127.0.0.1:8080:3000"
+
+    environment:
+
+      REDIS_URL: redis://dokploy-redis:6379
+
+      BETTER_AUTH_SECRET: supersecret123
+
+      DATABASE_URL: postgres://dokploy:dokploy@dokploy-postgres:5432/dokploy
+
+    depends_on:
+
+      - dokploy-postgres
+
+      - dokploy-redis
+
+    volumes:
+
+      - /var/run/docker.sock:/var/run/docker.sock
+
+      - dokploy-data:/data
+
+  dokploy-postgres:
+
+    image: postgres:15
+
+    container_name: dokploy-postgres
+
+    restart: unless-stopped
+
+    environment:
+
+      POSTGRES_USER: dokploy
+
+      POSTGRES_PASSWORD: dokploy
+
+      POSTGRES_DB: dokploy
+
+    volumes:
+
+      - dokploy-postgres:/var/lib/postgresql/data
+
+  dokploy-redis:
+
+    image: redis:7-alpine
+
+    container_name: dokploy-redis
+
+    restart: unless-stopped
+
+volumes:
+
+  dokploy-data:
+
+  dokploy-postgres:
