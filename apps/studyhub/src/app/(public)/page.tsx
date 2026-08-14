@@ -76,15 +76,14 @@ export default function LandingPage() {
     <main className={styles.page}>
       <header className={styles.header}>
         <Link href="/" className={styles.brand}>
-<Image
-  src="/images/studydocslogo.png"
-  alt="StudyDocs"
-  width={200}
-  height={140}
-  priority
-/>
-
-
+          <Image
+            src="/images/studydocslogo.png"
+            alt="StudyDocs"
+            width={320}
+            height={120}
+            className={styles.headerLogo}
+            priority
+          />
         </Link>
 
         <nav className={styles.navigation} aria-label="Primary navigation">
@@ -233,18 +232,12 @@ export default function LandingPage() {
 
           <Image
             src="/images/studydocsmascot.png"
-            width={560}
-            height={560}
+            width={700}
+            height={700}
             alt="StudyDocs mascot studying"
             className={styles.mascot}
             priority
           />
-
-          <div className={styles.books}>
-            <div>Algorithms</div>
-            <div>Microeconomics</div>
-            <div>Study Guide</div>
-          </div>
 
           <div className={styles.cup}>🦆</div>
         </div>
@@ -268,9 +261,9 @@ export default function LandingPage() {
       <section className={styles.closingMessage}>
         <Image
           src="/images/studydocslogo.png"
-          width={200}
-          height={140}
-          alt=""
+          width={240}
+          height={90}
+          alt="StudyDocs"
           className={styles.closingLogo}
         />
 
