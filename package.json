@@ -4,5 +4,12 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
+  }
 }
