@@ -18,9 +18,6 @@ import { and, eq } from "drizzle-orm";
 type RouteContext = {
   params: Promise<{ token: string }>;
 };
-<<<<<<< HEAD
-// Funktion til at acceptere en invite til en note, og dermed blive samarbejdspartner på noten
-=======
 
 /**
  * POST /api/invites/[token]/accept
@@ -28,7 +25,6 @@ type RouteContext = {
  * Accepts an invite link and gives the current user
  * persistent access to the shared note.
  */
->>>>>>> main
 export async function POST(
   _req: Request,
   { params }: RouteContext,

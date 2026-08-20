@@ -20,9 +20,6 @@ import { and, eq } from "drizzle-orm";
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
-<<<<<<< HEAD
-// Funktion til at tjekke om en bruger har adgang til en note, enten som ejer eller samarbejdspartner
-=======
 
 /**
  * Checks whether the user has access to the note.
@@ -30,7 +27,6 @@ type RouteContext = {
  * - the note owner
  * - or an existing collaborator
  */
->>>>>>> main
 async function hasAccess(noteId: string, userId: string) {
   /**
    * Find note by id
@@ -60,16 +56,12 @@ async function hasAccess(noteId: string, userId: string) {
 
   return !!collaborator;
 }
-<<<<<<< HEAD
-// Funktion til at hente en note, hvis brugeren enten er ejer eller samarbejdspartner
-=======
 
 /**
  * POST /api/notes/[id]/invites
  *
  * Creates a share/invite link for a note.
  */
->>>>>>> main
 export async function POST(
   _req: Request,
   { params }: RouteContext,
@@ -105,14 +97,10 @@ export async function POST(
       { status: 403 },
     );
   }
-<<<<<<< HEAD
-// Genererer et unikt token for invite linket
-=======
 
   /**
    * Generate secure random invite token
    */
->>>>>>> main
   const token = crypto.randomBytes(32).toString("hex");
 
   /**
