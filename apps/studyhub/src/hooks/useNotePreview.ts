@@ -4,18 +4,36 @@ import { useEffect, useRef } from "react";
 import type { Editor } from "@tiptap/react";
 import { toBlob } from "html-to-image";
 
-const LOCAL_PREVIEW_DEBOUNCE_MS = 1500;
-const PREVIEW_UPLOAD_DEBOUNCE_MS = 20_000;
+const LOCAL_PREVIEW_DEBOUNCE_MS = 1000;
+const PREVIEW_UPLOAD_DEBOUNCE_MS = 3000;
 
 const PREVIEW_WIDTH = 720;
 const PREVIEW_HEIGHT = 480;
+
+type PreviewStatus =
+  | "idle"
+  | "dirty"
+  | "generating"
+  | "ready"
+  | "uploading";
 
 export function useNotePreview(
   editor: Editor | null,
   noteId: string,
 ) {
   const latestPreviewBlobRef = useRef<Blob | null>(null);
-  const previewIsDirtyRef = useRef(false);
+
+  const statusRef = useRef<PreviewStatus>("idle");
+
+  /*
+   * Dokumentet kan være ændret siden sidste genererede preview.
+   */
+  const documentVersionRef = useRef(0);
+
+  /*
+   * Versionen som den seneste preview-blob repræsenterer.
+   */
+  const previewVersionRef = useRef(0);
 
   useEffect(() => {
     if (!editor || editor.isDestroyed) {
@@ -25,13 +43,14 @@ export function useNotePreview(
     let generateTimeout: ReturnType<typeof setTimeout> | null = null;
     let uploadTimeout: ReturnType<typeof setTimeout> | null = null;
 
-    let isGenerating = false;
-    let isUploading = false;
-
-    let generateAgain = false;
-    let uploadAgain = false;
-
     let disposed = false;
+
+    /*
+     * Bruges når en ændring kommer,
+     * mens generation eller upload allerede kører.
+     */
+    let pendingGeneration = false;
+    let pendingUpload = false;
 
     const clearGenerateTimeout = () => {
       if (generateTimeout) {
@@ -52,27 +71,35 @@ export function useNotePreview(
     }: {
       keepalive?: boolean;
     } = {}) => {
+      if (disposed) {
+        return;
+      }
+
       const blob = latestPreviewBlobRef.current;
 
-      if (!blob || !previewIsDirtyRef.current) {
+      if (!blob) {
         return;
       }
 
-      if (isUploading) {
-        uploadAgain = true;
+      /*
+       * Hvis den allerede uploader,
+       * så bed den om at køre igen bagefter.
+       */
+      if (statusRef.current === "uploading") {
+        pendingUpload = true;
         return;
       }
 
-      isUploading = true;
+      const uploadedVersion = previewVersionRef.current;
 
-      const blobBeingUploaded = blob;
+      statusRef.current = "uploading";
 
       try {
         const formData = new FormData();
 
         formData.append(
           "file",
-          blobBeingUploaded,
+          blob,
           `note-${noteId}-preview.webp`,
         );
 
@@ -87,7 +114,9 @@ export function useNotePreview(
 
         if (!response.ok) {
           const data = (await response.json().catch(() => null)) as
-            | { error?: string }
+            | {
+                error?: string;
+              }
             | null;
 
           throw new Error(
@@ -96,21 +125,30 @@ export function useNotePreview(
         }
 
         /*
-         * Previewet er kun clean, hvis den uploadede blob
-         * stadig er den nyeste version.
+         * Hvis dokumentet ikke har ændret sig siden
+         * previewet blev genereret, er vi helt clean.
          */
-        if (latestPreviewBlobRef.current === blobBeingUploaded) {
-          previewIsDirtyRef.current = false;
+        if (
+          previewVersionRef.current === uploadedVersion &&
+          documentVersionRef.current === uploadedVersion
+        ) {
+          statusRef.current = "idle";
+        } else {
+          statusRef.current = "dirty";
         }
       } catch (error) {
+        statusRef.current = "ready";
+
         if (!disposed) {
-          console.error("Note preview upload failed:", error);
+          console.error(
+            "Note preview upload failed:",
+            error,
+          );
         }
       } finally {
-        isUploading = false;
+        if (pendingUpload && !disposed) {
+          pendingUpload = false;
 
-        if (uploadAgain && !disposed) {
-          uploadAgain = false;
           void uploadPreview();
         }
       }
@@ -121,17 +159,25 @@ export function useNotePreview(
         return;
       }
 
-      if (isGenerating) {
-        generateAgain = true;
+      /*
+       * Der kører allerede en generation.
+       * Kør igen bagefter hvis dokumentet blev ændret.
+       */
+      if (statusRef.current === "generating") {
+        pendingGeneration = true;
         return;
       }
 
-      isGenerating = true;
+      const versionBeingGenerated =
+        documentVersionRef.current;
+
+      statusRef.current = "generating";
 
       try {
         const editorElement = editor.view.dom;
 
         if (!editorElement.isConnected) {
+          statusRef.current = "dirty";
           return;
         }
 
@@ -142,6 +188,7 @@ export function useNotePreview(
           editor.isDestroyed ||
           !editorElement.isConnected
         ) {
+          statusRef.current = "dirty";
           return;
         }
 
@@ -170,8 +217,12 @@ export function useNotePreview(
             if (
               node.hasAttribute("data-resize-handle") ||
               node.classList.contains("ProseMirror-gapcursor") ||
-              node.classList.contains("collaboration-carets__caret") ||
-              node.classList.contains("collaboration-carets__label")
+              node.classList.contains(
+                "collaboration-carets__caret",
+              ) ||
+              node.classList.contains(
+                "collaboration-carets__label",
+              )
             ) {
               return false;
             }
@@ -189,8 +240,25 @@ export function useNotePreview(
         const webpBlob = await convertBlobToWebP(blob);
 
         latestPreviewBlobRef.current = webpBlob;
-        previewIsDirtyRef.current = true;
+        previewVersionRef.current =
+          versionBeingGenerated;
+
+        /*
+         * Hvis dokumentet blev ændret under generationen,
+         * er dette preview allerede gammelt.
+         */
+        if (
+          documentVersionRef.current !==
+          versionBeingGenerated
+        ) {
+          statusRef.current = "dirty";
+          pendingGeneration = true;
+        } else {
+          statusRef.current = "ready";
+        }
       } catch (error) {
+        statusRef.current = "dirty";
+
         if (!disposed) {
           console.error(
             "Note preview generation failed:",
@@ -198,10 +266,8 @@ export function useNotePreview(
           );
         }
       } finally {
-        isGenerating = false;
-
-        if (generateAgain && !disposed) {
-          generateAgain = false;
+        if (pendingGeneration && !disposed) {
+          pendingGeneration = false;
 
           clearGenerateTimeout();
 
@@ -213,55 +279,104 @@ export function useNotePreview(
     };
 
     const schedulePreview = () => {
+      /*
+       * Dokumentet har nu en ny version.
+       */
+      documentVersionRef.current += 1;
+
+      statusRef.current = "dirty";
+
       clearGenerateTimeout();
       clearUploadTimeout();
 
       /*
-       * Lav preview lokalt relativt hurtigt.
+       * Lav thumbnail lokalt efter kort inaktivitet.
        */
       generateTimeout = setTimeout(() => {
         void generatePreview();
       }, LOCAL_PREVIEW_DEBOUNCE_MS);
 
       /*
-       * Upload kun hvis brugeren har været inaktiv i 20 sekunder.
+       * Upload efter længere inaktivitet.
+       *
+       * Hvis blob endnu ikke findes,
+       * sørger flushPreview for at generere først.
        */
       uploadTimeout = setTimeout(() => {
-        void uploadPreview();
+        void flushPreview();
       }, PREVIEW_UPLOAD_DEBOUNCE_MS);
     };
 
-    /*
-     * Upload seneste genererede preview med det samme.
-     *
-     * Vi forsøger ikke at generere et nyt screenshot her,
-     * fordi editor-DOM'en kan være ved at blive unmounted.
-     */
-    const flushPreview = () => {
-      clearUploadTimeout();
-
-      if (!previewIsDirtyRef.current) {
+    const flushPreview = async ({
+      keepalive = false,
+    }: {
+      keepalive?: boolean;
+    } = {}) => {
+      if (disposed || editor.isDestroyed) {
         return;
       }
 
-      void uploadPreview({
+      clearGenerateTimeout();
+      clearUploadTimeout();
+
+      /*
+       * Hvis dokumentets aktuelle version ikke allerede
+       * findes som preview, generér den først.
+       */
+      if (
+        !latestPreviewBlobRef.current ||
+        previewVersionRef.current !==
+          documentVersionRef.current
+      ) {
+        await generatePreview();
+      }
+
+      /*
+       * Generation kan have fejlet eller editoren kan være
+       * blevet destroyed undervejs.
+       */
+      if (
+        disposed ||
+        editor.isDestroyed ||
+        !latestPreviewBlobRef.current
+      ) {
+        return;
+      }
+
+      /*
+       * Upload kun hvis preview-versionen svarer
+       * til dokumentets seneste version.
+       */
+      if (
+        previewVersionRef.current ===
+        documentVersionRef.current
+      ) {
+        await uploadPreview({
+          keepalive,
+        });
+      }
+    };
+
+    const handlePageHide = () => {
+      void flushPreview({
         keepalive: true,
       });
     };
 
-    const handlePageHide = () => {
-      flushPreview();
-    };
-
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        flushPreview();
+        void flushPreview({
+          keepalive: true,
+        });
       }
     };
 
     editor.on("update", schedulePreview);
 
-    window.addEventListener("pagehide", handlePageHide);
+    window.addEventListener(
+      "pagehide",
+      handlePageHide,
+    );
 
     document.addEventListener(
       "visibilitychange",
@@ -270,10 +385,12 @@ export function useNotePreview(
 
     return () => {
       /*
-       * Vigtigt:
-       * flush først, mens hookens state stadig er aktiv.
+       * Forsøg at gemme den nyeste preview-version
+       * inden editoren forsvinder.
        */
-      flushPreview();
+      void flushPreview({
+        keepalive: true,
+      });
 
       editor.off("update", schedulePreview);
 
@@ -290,7 +407,13 @@ export function useNotePreview(
       clearGenerateTimeout();
       clearUploadTimeout();
 
-      disposed = true;
+      /*
+       * Sæt disposed sidst, så flushPreview får
+       * mulighed for at starte først.
+       */
+      queueMicrotask(() => {
+        disposed = true;
+      });
     };
   }, [editor, noteId]);
 }
@@ -396,13 +519,17 @@ async function waitForImages(
           image.addEventListener(
             "load",
             done,
-            { once: true },
+            {
+              once: true,
+            },
           );
 
           image.addEventListener(
             "error",
             done,
-            { once: true },
+            {
+              once: true,
+            },
           );
         });
       }

@@ -3,7 +3,7 @@
 
   display: block;
 
-  overflow: hidden;
+  overflow: visible;
 
   color: inherit;
   text-decoration: none;
@@ -39,6 +39,7 @@
   background: #f9fafb;
 
   border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px 12px 0 0;
 }
 
 .previewImage {
@@ -86,35 +87,54 @@
 
 .body {
   padding: 0.9rem 1rem;
+
+  border-radius: 0 0 12px 12px;
 }
 
 .title {
   margin: 0;
 
+  overflow: hidden;
+
+  color: #111827;
+
   font-size: 0.95rem;
   font-weight: 600;
 
-  color: #111827;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .meta {
-  margin-top: 0.35rem;
+  margin: 0.35rem 0 0;
+
+  overflow: hidden;
+
+  color: #6b7280;
 
   font-size: 0.8rem;
 
-  color: #6b7280;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* =========================
-   Delete button
+   Card actions
 ========================= */
 
-.deleteButton {
+.cardActions {
   position: absolute;
-
   top: 0.75rem;
   right: 0.75rem;
 
+  z-index: 20;
+}
+
+/* =========================
+   Three-dot button
+========================= */
+
+.menuButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,30 +142,160 @@
   width: 32px;
   height: 32px;
 
+  padding: 0;
+
   opacity: 0;
 
-  color: #9ca3af;
+  color: #6b7280;
 
-  background: rgb(255 255 255 / 92%);
+  background: rgb(255 255 255 / 94%);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 
-  border: none;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
+
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 
   cursor: pointer;
 
   transition:
     opacity 150ms ease,
     color 150ms ease,
-    background 150ms ease;
+    background-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
-.card:hover .deleteButton {
+.card:hover .menuButton,
+.menuButton:focus-visible {
   opacity: 1;
 }
 
-.deleteButton:hover {
-  color: #ef4444;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+.menuButton:hover {
+  color: #111827;
+
   background: #ffffff;
+
+  box-shadow: 0 3px 10px rgb(0 0 0 / 14%);
+}
+
+/*
+ * Sørg for at knappen forbliver synlig,
+ * mens menuen er åben.
+ */
+.menuButton[aria-expanded="true"] {
+  opacity: 1;
+
+  color: #111827;
+
+  background: #ffffff;
+}
+
+/* =========================
+   Action menu
+========================= */
+
+.actionMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+
+  width: 170px;
+
+  padding: 5px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+
+  box-shadow:
+    0 12px 30px rgb(0 0 0 / 12%),
+    0 2px 6px rgb(0 0 0 / 6%);
+
+  z-index: 30;
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+
+  padding: 8px 9px;
+
+  color: #374151;
+
+  background: transparent;
+
+  border: none;
+  border-radius: 6px;
+
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.actionMenuItem:hover {
+  color: #111827;
+
+  background: #f3f4f6;
+}
+
+.actionMenuItem svg {
+  flex-shrink: 0;
+}
+
+/* =========================
+   Menu divider
+========================= */
+
+.actionMenuDivider {
+  height: 1px;
+
+  margin: 4px 3px;
+
+  background: #e5e7eb;
+}
+
+/* =========================
+   Danger action
+========================= */
+
+.dangerMenuItem {
+  color: #dc2626;
+}
+
+.dangerMenuItem:hover {
+  color: #b91c1c;
+
+  background: #fef2f2;
+}
+
+/* =========================
+   Keyboard focus
+========================= */
+
+.menuButton:focus-visible,
+.actionMenuItem:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* =========================
+   Touch devices
+========================= */
+
+@media (hover: none) {
+  .menuButton {
+    opacity: 1;
+  }
 }
