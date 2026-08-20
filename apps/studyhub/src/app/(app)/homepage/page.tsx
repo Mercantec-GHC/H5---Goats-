@@ -1,17 +1,29 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { db, notePlacements } from "@studyhub/db";
+import { db, notePlacements, subjects } from "@studyhub/db";
 import { desc, eq } from "drizzle-orm";
-import styles from "./page.module.css";
-import NoteCard from "@/components/NoteCard";
-import CreateNoteCard from "@/components/CreateNoteCard";
+
 import NotesSearch from "@/components/notes/NotesSearch";
-export default async function Homepage() {
+import DashboardRefresh from "@/components/DashboardRefresh";
+
+import styles from "./page.module.css";
+
+export const dynamic = "force-dynamic";
+
+type HomepageProps = {
+  searchParams: Promise<{
+    topic?: string;
+  }>;
+};
+
+export default async function Homepage({ searchParams }: HomepageProps) {
   const session = await auth();
 
   if (!session?.user?.id) {
     redirect("/login");
   }
+
+  const { topic: activeTopicId } = await searchParams;
 
   const placements = await db.query.notePlacements.findMany({
     where: eq(notePlacements.userId, session.user.id),
@@ -22,91 +34,70 @@ export default async function Homepage() {
     orderBy: [desc(notePlacements.createdAt)],
   });
 
-  const notes = placements.map((placement) => ({
-    ...placement.note,
-    topicId: placement.topicId,
-    topic: placement.topic,
-  }));
+  const subjectStructure = await db.query.subjects.findMany({
+    where: eq(subjects.ownerId, session.user.id),
+    with: {
+      topics: true,
+    },
+    orderBy: [desc(subjects.createdAt)],
+  });
 
-  const sharedWithMe = notes.filter((note) => note.ownerId !== session.user.id);
+  const allNotes = placements
+    .map((placement) => ({
+      ...placement.note,
+      topicId: placement.topicId,
+      topic: placement.topic,
+    }))
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
 
-  const ownNotes = notes.filter((note) => note.ownerId === session.user.id);
+  /*
+   * Hvis et topic er valgt i sidebaren,
+   * viser vi kun noter fra dette topic.
+   */
+  const notes = activeTopicId
+    ? allNotes.filter((note) => note.topicId === activeTopicId)
+    : allNotes;
 
-  const unsorted = ownNotes.filter((note) => note.topicId === null);
-  const recent = notes.slice(0, 6);
+  /*
+   * Find det aktive topic + dets subject,
+   * så NotesSearch kan vise fx:
+   *
+   * Dansk / Analyse
+   */
+  const activeSubject = activeTopicId
+    ? subjectStructure.find((subject) =>
+        subject.topics.some((topic) => topic.id === activeTopicId),
+      )
+    : undefined;
+
+  const activeTopic = activeSubject?.topics.find(
+    (topic) => topic.id === activeTopicId,
+  );
+
+  /*
+   * Hvis URL'en indeholder et topic,
+   * som brugeren ikke ejer/har adgang til,
+   * sender vi dem tilbage til normal homepage.
+   */
+  if (activeTopicId && !activeTopic) {
+    redirect("/homepage");
+  }
 
   return (
     <main className={styles.container}>
-      <div className={styles.header}>
-        <h1>Velkommen tilbage 👋</h1>
-        <p>Fortsæt hvor du slap</p>
-      </div>
+      <DashboardRefresh />
 
-      <section className={styles.section}>
-        <NotesSearch notes={notes} currentUserId={session.user.id} />
-        <h2 className={styles.sectionTitle}>Seneste noter</h2>
-
-        <div className={styles.grid}>
-          <CreateNoteCard />
-
-          {recent.map((note) => (
-            <NoteCard
-              key={note.id}
-              id={note.id}
-              title={note.title}
-              previewImageUrl={note.previewImageUrl}
-              topicTitle={
-                note.ownerId !== session.user.id
-                  ? "Delt med mig"
-                  : note.topic?.title
-              }
-              updatedAt={note.updatedAt}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Delt med mig</h2>
-
-        {sharedWithMe.length === 0 ? (
-          <p>Ingen delte noter endnu</p>
-        ) : (
-          <div className={styles.grid}>
-            {sharedWithMe.map((note) => (
-              <NoteCard
-                key={note.id}
-                id={note.id}
-                title={note.title}
-                previewImageUrl={note.previewImageUrl}
-                topicTitle="Delt med mig"
-                updatedAt={note.updatedAt}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Unsorted</h2>
-
-        {unsorted.length === 0 ? (
-          <p>Ingen unsorted noter</p>
-        ) : (
-          <div className={styles.grid}>
-            {unsorted.map((note) => (
-              <NoteCard
-                key={note.id}
-                id={note.id}
-                title={note.title}
-                previewImageUrl={note.previewImageUrl}
-                topicTitle={null}
-                updatedAt={note.updatedAt}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      <NotesSearch
+        notes={notes}
+        currentUserId={session.user.id}
+        subjects={subjectStructure}
+        activeTopicId={activeTopicId ?? null}
+        activeTopicTitle={activeTopic?.title ?? null}
+        activeSubjectTitle={activeSubject?.title ?? null}
+      />
     </main>
   );
 }

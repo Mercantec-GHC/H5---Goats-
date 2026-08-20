@@ -5,7 +5,7 @@ import {
 import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { db } from "@studyhub/db";
 import { notes } from "@studyhub/db";
@@ -151,6 +151,7 @@ export async function POST(
       updatedAt: new Date(),
     })
     .where(eq(notes.id, noteId));
+    revalidatePath("/");
 
   return NextResponse.json({
     ok: true,
